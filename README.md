@@ -3,10 +3,10 @@
 
 Teams:
 
-- SPEECH Recognition
+- SR: SPEECH Recognition
 
-- TEXT Preprocessing
+- TP: TEXT Preprocessing
 
-- Converssatioonal Agents
+- CA: Converssatioonal Agents
 
 
