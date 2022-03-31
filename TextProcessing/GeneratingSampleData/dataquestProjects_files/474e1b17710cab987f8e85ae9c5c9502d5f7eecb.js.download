@@ -1,0 +1,36 @@
+if ('define' in window) {
+define("discourse/theme-9/pre-initializers/theme-9-translations", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+  var _default = {
+    name: "theme-9-translations",
+    initialize: function initialize() {
+      /* Translation data for theme 9 (en)*/
+      var data = {
+        "en": {
+          "unanswered": {
+            "title": "Unanswered",
+            "help": "Topics that have not been answered"
+          }
+        }
+      };
+
+      for (var lang in data) {
+        var cursor = I18n.translations;
+
+        for (var _i = 0, _arr = [lang, "js", "theme_translations"]; _i < _arr.length; _i++) {
+          var key = _arr[_i];
+          cursor = cursor[key] = cursor[key] || {};
+        }
+
+        cursor[9] = data[lang];
+      }
+    }
+  };
+  _exports.default = _default;
+});
+}

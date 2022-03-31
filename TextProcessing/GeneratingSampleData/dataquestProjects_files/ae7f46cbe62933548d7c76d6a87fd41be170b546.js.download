@@ -1,0 +1,12 @@
+(function() {
+  if ('require' in window) {
+    require("discourse/lib/theme-settings-store").registerSettings(4, {"theme_uploads":{"dq-blm-logo":"/uploads/default/original/2X/3/3fa15627dcc548a7009b9733cb65b39c848e3172.gif"}});
+  }
+})();
+
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-41411988-12');
+

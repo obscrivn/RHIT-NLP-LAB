@@ -1,0 +1,7 @@
+
+
+var TopicListComponent = require('discourse/components/topic-list').default;
+TopicListComponent.reopen({
+    showLikes: true
+});
+

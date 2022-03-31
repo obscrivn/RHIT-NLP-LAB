@@ -1,0 +1,59 @@
+(function() {
+  if ('require' in window) {
+    require("discourse/lib/theme-settings-store").registerSettings(9, {"exclusions":"/top|/c/known-bugs/|/"});
+  }
+})();
+if ('define' in window) {
+define("discourse/theme-9/initializers/theme-field-23-common-html-script-1", ["exports", "discourse/lib/plugin-api"], function (_exports, _pluginApi) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(9);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.9.".concat(key);
+  };
+
+  var _default = {
+    name: "theme-field-23-common-html-script-1",
+    after: "inject-objects",
+    initialize: function initialize() {
+      (0, _pluginApi.withPluginApi)("0.8", function (api) {
+        var exclusionList = settings.exclusions.split("|");
+        api.addNavigationBarItem({
+          name: "unanswered",
+          displayName: I18n.t(themePrefix("unanswered.title")),
+          title: I18n.t(themePrefix("unanswered.help")),
+          customFilter: function customFilter(category, args, router) {
+            return exclusionList.indexOf(router.currentURL) < 0;
+          },
+          customHref: function customHref(category, args, router) {
+            var routeName = args.filterMode === "categories" ? "discovery.latest" : router.currentRouteName;
+            return router.urlFor(routeName, {
+              queryParams: {
+                max_posts: 1
+              }
+            });
+          }
+        });
+        api.modifyClass("component:navigation-item", {
+          active: Ember.computed("contentFilterMode", "filterMode", function () {
+            var contentFilterMode = this.get("content").get("filterMode");
+
+            if (window.location.search && window.location.search.split("&")[0] === "?max_posts=1") {
+              return contentFilterMode === "unanswered";
+            } else {
+              return this._super(contentFilterMode, this.get("filterMode"));
+            }
+          })
+        });
+      });
+    }
+  };
+  _exports.default = _default;
+});
+}

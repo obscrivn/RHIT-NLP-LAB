@@ -1,0 +1,78 @@
+(function() {
+  if ('require' in window) {
+    require("discourse/lib/theme-settings-store").registerSettings(10, {"blog_category":"dataquest-direct","blog_tag":"","image_display_style":"center fit","mobile_enabled":false,"no_images":false,"full_width":false});
+  }
+})();
+if ('define' in window) {
+define("discourse/theme-10/blog-post-styling/components/blog-image", ["exports", "discourse/models/category", "@ember/component", "discourse-common/utils/decorators"], function (_exports, _category, _component, _decorators) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var _dec, _dec2, _obj, _obj2;
+
+  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(10);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.10.".concat(key);
+  };
+
+  var _default = _component.default.extend((_dec = (0, _decorators.default)("topic.category_id", "topic.tags"), _dec2 = (0, _decorators.default)("topic.thumbnails"), (_obj = (_obj2 = {
+    isBlogTopic: false,
+    imageURL: null
+  }, _defineProperty(_obj2, "isBlogTopic", function isBlogTopic(categoryId, topicTags) {
+    var hasCategory = false;
+    var hasTag = false;
+
+    if (settings.no_images) {
+      return false;
+    }
+
+    if (categoryId) {
+      var allowedCategories = settings.blog_category.split(",");
+
+      var currentCategory = _category.default.findById(categoryId);
+
+      var parentCategorySlug = currentCategory.parentCategory ? "".concat(currentCategory.parentCategory.slug, "-") : "";
+      hasCategory = allowedCategories.some(function (c) {
+        return c.trim() === "".concat(parentCategorySlug).concat(currentCategory.slug);
+      });
+    }
+
+    if (topicTags) {
+      var allowedTags = settings.blog_tag.split("|");
+      hasTag = allowedTags.some(function (tag) {
+        return topicTags.includes(tag);
+      });
+    }
+
+    return hasCategory || hasTag;
+  }), _defineProperty(_obj2, "imageURL", function imageURL(thumbnails) {
+    if (thumbnails) {
+      return thumbnails[0].url;
+    }
+  }), _obj2), (_applyDecoratedDescriptor(_obj, "isBlogTopic", [_dec], Object.getOwnPropertyDescriptor(_obj, "isBlogTopic"), _obj), _applyDecoratedDescriptor(_obj, "imageURL", [_dec2], Object.getOwnPropertyDescriptor(_obj, "imageURL"), _obj)), _obj)));
+
+  _exports.default = _default;
+});
+}
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/discourse/connectors/topic-above-post-stream/blog-post-styling"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[1,[28,\"blog-image\",null,[[\"topic\"],[[24,[\"model\"]]]]],false]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/components/blog-image"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[4,\"if\",[[24,[\"isBlogTopic\"]]],null,{\"statements\":[[4,\"if\",[[24,[\"imageURL\"]]],null,{\"statements\":[[0,\"  \"],[7,\"div\",true],[10,\"class\",\"blog-image-container\"],[8],[0,\"\\n    \"],[7,\"div\",true],[10,\"class\",\"blog-image\"],[11,\"style\",[29,[\"background-image: url('\",[22,\"imageURL\"],\"')\"]]],[8],[9],[0,\"\\n  \"],[9],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+

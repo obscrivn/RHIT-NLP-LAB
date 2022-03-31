@@ -1,0 +1,37 @@
+(function() {
+  if ('require' in window) {
+    require("discourse/lib/theme-settings-store").registerSettings(4, {"theme_uploads":{"dq-blm-logo":"/uploads/default/original/2X/3/3fa15627dcc548a7009b9733cb65b39c848e3172.gif"}});
+  }
+})();
+
+// Set the date we're counting down to
+var countDownDate = new Date("Feb 18, 2022 23:59:59");
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date();
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate - new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Display the result in the element with id="demo"
+  document.getElementById("super-banner-timer-days").innerHTML = days.toString().padStart(2, '0');
+  document.getElementById("super-banner-timer-hours").innerHTML = hours.toString().padStart(2, '0')
+  document.getElementById("super-banner-timer-minutes").innerHTML = minutes.toString().padStart(2, '0')
+  document.getElementById("super-banner-timer-seconds").innerHTML = seconds.toString().padStart(2, '0')
+
+  // If the count down is finished, write some text
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("super-banner-timer").remove();
+  }
+}, 1000);
+

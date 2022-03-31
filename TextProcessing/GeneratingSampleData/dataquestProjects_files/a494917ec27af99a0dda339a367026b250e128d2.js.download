@@ -1,0 +1,2394 @@
+(function() {
+  if ('require' in window) {
+    require("discourse/lib/theme-settings-store").registerSettings(12, {"topic_list_tiles_topic_lists":"","topic_list_tiles_categories":"54","topic_list_tiles_tags":"","topic_list_thumbnails_topic_lists":"latest|new|unread|top|tag|suggested|agenda|activity-topics|activity-portfolio|latest-mobile|new-mobile|unread-mobile|top-mobile|tag-mobile|suggested-mobile|agenda-mobile|activity-topics-mobile|activity-portfolio-mobile","topic_list_thumbnails_categories":"54","topic_list_thumbnails_tags":"","topic_list_excerpts_topic_lists":"","topic_list_excerpts_categories":"54","topic_list_excerpts_tags":"","topic_list_actions_topic_lists":"latest|new|unread|top|tag|suggested|agenda|activity-topics|activity-portfolio|latest-mobile|new-mobile|unread-mobile|top-mobile|tag-mobile|agenda-mobile|activity-topics-mobile|activity-portfolio-mobile","topic_list_actions_categories":"54","topic_list_actions_tags":"","topic_list_set_category_defaults":false,"topic_list_show_like_on_current_users_posts":true,"topic_list_tiles_transition_time":0.5,"topic_list_tiles_larger_featured_tiles":true,"topic_list_portfolio":true,"topic_list_portfolio_filter_type":"tag","topic_list_portfolio_filter_parameter":"","topic_list_default_thumbnail":"","topic_list_default_thumbnail_fallback":false,"topic_list_thumbnail_resolution_level":2,"topic_list_thumbnail_width":150,"topic_list_thumbnail_height":100,"topic_list_thumbnail_first_x_rows":0,"topic_list_featured_images":false,"topic_list_featured_images_resolution_level":2,"topic_list_featured_images_category":false,"topic_list_featured_images_from_current_category_only":true,"topic_list_featured_images_tag":"","topic_list_featured_images_tag_show":true,"topic_list_featured_images_count":0,"topic_list_featured_images_created_order":false,"topic_list_featured_width":0,"topic_list_featured_height":150,"topic_list_featured_title":"","topic_list_featured_excerpt":100,"topic_list_test_image_url_timeout":5000});
+  }
+})();
+if ('define' in window) {
+define("discourse/theme-12/components/select-thumbnail", ["exports", "discourse/lib/ajax", "discourse/lib/ajax-error", "discourse/lib/show-modal", "discourse-common/utils/decorators"], function (_exports, _ajax, _ajaxError, _showModal, _decorators) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var _obj;
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = Ember.Component.extend((_obj = {
+    classNames: 'select-thumbnail',
+    showSelected: function showSelected() {
+      return this.get('buffered.user_chosen_thumbnail_url') ? true : false;
+    },
+    actions: {
+      showThumbnailSelector: function showThumbnailSelector() {
+        var _this = this;
+
+        (0, _ajax.ajax)("/topic-previews/thumbnail-selection.json?topic=".concat(this.get('topic_id'))).then(function (result) {
+          var controller = (0, _showModal.default)('tlp-thumbnail-selector', {
+            model: {
+              thumbnails: result,
+              topic_id: _this.get('topic_id'),
+              topic_title: _this.get('topic_title'),
+              buffered: _this.get('buffered')
+            }
+          });
+        }).catch(function (error) {
+          (0, _ajaxError.popupAjaxError)(error);
+        });
+      }
+    }
+  }, (_applyDecoratedDescriptor(_obj, "showSelected", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "showSelected"), _obj)), _obj));
+
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/components/tlp-featured-topic", ["exports", "discourse/lib/url", "discourse-common/utils/decorators", "../lib/tlp-utilities"], function (_exports, _url, _decorators, _tlpUtilities) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var _dec, _dec2, _obj;
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = Ember.Component.extend((_dec = (0, _decorators.default)('topic.tags'), _dec2 = (0, _decorators.default)('topic.id'), (_obj = {
+    tagName: 'a',
+    attributeBindings: ['href'],
+    classNameBindings: [':tlp-featured-topic', "showDetails", 'featuredTag'],
+    didInsertElement: function didInsertElement() {
+      var _this = this;
+
+      var topic = this.get('topic');
+
+      if (topic) {
+        var defaultThumbnail = (0, _tlpUtilities.getDefaultThumbnail)();
+        (0, _tlpUtilities.testImageUrl)(topic.thumbnails, this.get("currentUser"), function (imageLoaded) {
+          if (!imageLoaded) {
+            Ember.run.scheduleOnce('afterRender', _this, function () {
+              if (defaultThumbnail) {
+                if (_this._state === 'destroying') return;
+
+                var $thumbnail = _this.element('img.thumbnail');
+
+                if ($thumbnail) {
+                  $thumbnail.attr('src', defaultThumbnail);
+                }
+              } else {
+                if (_this._state === 'destroying') return;
+                _this.element.style.display = 'none';
+              }
+            });
+          }
+        });
+      }
+    },
+    featuredUser: function featuredUser() {
+      return this.get('topic').posters[0].user;
+    },
+    featuredUsername: function featuredUsername() {
+      return this.get('topic').posters[0].user.username;
+    },
+    featuredExcerpt: function featuredExcerpt() {
+      return settings.topic_list_featured_excerpt > 0 && this.get('topic').excerpt ? this.get('topic').excerpt.slice(0, settings.topic_list_featured_excerpt) : false;
+    },
+    featuredTags: function featuredTags() {
+      return settings.topic_list_featured_images_tag.split('|');
+    },
+    featuredTag: function featuredTag(tags) {
+      var _this2 = this;
+
+      return tags.filter(function (tag) {
+        return _this2.get('featuredTags').indexOf(tag) > -1;
+      })[0];
+    },
+    mouseEnter: function mouseEnter() {
+      this.set('showDetails', true);
+    },
+    mouseLeave: function mouseLeave() {
+      this.set('showDetails', false);
+    },
+    href: function href(topicId) {
+      return "/t/".concat(topicId);
+    },
+    click: function click(e) {
+      e.preventDefault();
+
+      _url.default.routeTo(this.get('href'));
+    }
+  }, (_applyDecoratedDescriptor(_obj, "featuredUser", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "featuredUser"), _obj), _applyDecoratedDescriptor(_obj, "featuredUsername", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "featuredUsername"), _obj), _applyDecoratedDescriptor(_obj, "featuredExcerpt", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "featuredExcerpt"), _obj), _applyDecoratedDescriptor(_obj, "featuredTags", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "featuredTags"), _obj), _applyDecoratedDescriptor(_obj, "featuredTag", [_dec], Object.getOwnPropertyDescriptor(_obj, "featuredTag"), _obj), _applyDecoratedDescriptor(_obj, "href", [_dec2], Object.getOwnPropertyDescriptor(_obj, "href"), _obj)), _obj)));
+
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/components/tlp-featured-topics", ["exports", "discourse-common/utils/decorators", "discourse/lib/text", "discourse/lib/cached-topic-list"], function (_exports, _decorators, _text, _cachedTopicList) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var _dec, _dec2, _dec3, _obj;
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = Ember.Component.extend((_dec = (0, _decorators.observes)('featuredTopics'), _dec2 = (0, _decorators.on)('init'), _dec3 = (0, _decorators.on)('init'), (_obj = {
+    classNameBindings: [':tlp-featured-topics', 'hasTopics'],
+    hasTopics: Ember.computed.notEmpty('featuredTopics'),
+    featuredTopics: null,
+    setup: function setup() {
+      this.appEvents.trigger('topic:refresh-timeline-position');
+    },
+    setupTitle: function setupTitle() {
+      var _this = this;
+
+      var showFeaturedTitle = this.get('showFeaturedTitle');
+
+      if (showFeaturedTitle) {
+        var raw = settings.topic_list_featured_title;
+        (0, _text.cookAsync)(raw).then(function (cooked) {
+          return _this.set('featuredTitle', cooked);
+        });
+      }
+    },
+    showFeaturedTitle: function showFeaturedTitle() {
+      return settings.topic_list_featured_title;
+    },
+    featuredTags: function featuredTags() {
+      return settings.topic_list_featured_images_tag.split('|');
+    },
+    showFeaturedTags: function showFeaturedTags() {
+      return this.get('featuredTags') && settings.topic_list_featured_images_tag_show;
+    }
+  }, (_applyDecoratedDescriptor(_obj, "setup", [_dec, _dec2], Object.getOwnPropertyDescriptor(_obj, "setup"), _obj), _applyDecoratedDescriptor(_obj, "setupTitle", [_dec3], Object.getOwnPropertyDescriptor(_obj, "setupTitle"), _obj), _applyDecoratedDescriptor(_obj, "showFeaturedTitle", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "showFeaturedTitle"), _obj), _applyDecoratedDescriptor(_obj, "featuredTags", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "featuredTags"), _obj), _applyDecoratedDescriptor(_obj, "showFeaturedTags", [_decorators.default], Object.getOwnPropertyDescriptor(_obj, "showFeaturedTags"), _obj)), _obj)));
+
+  _exports.default = _default;
+});
+}
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/discourse/connectors/discovery-list-container-top/featured-topics-discovery"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[4,\"if\",[[24,[\"showFeaturedImages\"]]],null,{\"statements\":[[4,\"if\",[[24,[\"featuredTopics\"]]],null,{\"statements\":[[0,\"    \"],[1,[28,\"tlp-featured-topics\",null,[[\"featuredTopics\"],[[24,[\"featuredTopics\"]]]]],false],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+if ('define' in window) {
+define("discourse/theme-12/connectors/discovery-list-container-top/featured-topics-discovery", ["exports", "discourse-common/lib/get-owner"], function (_exports, _getOwner) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = {
+    setupComponent: function setupComponent(attrs, component) {
+      var _this = this;
+
+      var determineImages = function determineImages(controller) {
+        var featuredTopics = controller.get('featuredTopics');
+        featuredTopics = featuredTopics ? featuredTopics.topic_list.topics : [];
+        var showFeaturedImages = settings.topic_list_featured_images && controller.category == null || settings.topic_list_featured_images_category && controller.category != null;
+
+        if (controller.category && settings.topic_list_featured_images_from_current_category_only) {
+          featuredTopics = featuredTopics.filter(function (topic) {
+            return topic.category_id == controller.category.id;
+          });
+        }
+
+        ;
+        var reducedFeaturedTopics = featuredTopics ? settings.topic_list_featured_images_count == 0 ? featuredTopics : featuredTopics.slice(0, settings.topic_list_featured_images_count) : [];
+
+        if (settings.topic_list_featured_images_created_order) {
+          reducedFeaturedTopics.sort(function (a, b) {
+            var keyA = new Date(a.created_at),
+                keyB = new Date(b.created_at); // Compare the 2 dates
+
+            if (keyA < keyB) return 1;
+            if (keyA > keyB) return -1;
+            return 0;
+          });
+        }
+
+        component.set('showFeaturedImages', showFeaturedImages);
+        component.set('featuredTopics', reducedFeaturedTopics);
+      };
+
+      var controller = (0, _getOwner.getOwner)(this).lookup('controller:discovery');
+      determineImages(controller);
+      controller.addObserver('featuredTopics', function () {
+        if (_this._state === 'destroying') return;
+        determineImages(controller);
+      });
+      controller.addObserver('category', function () {
+        if (_this._state === 'destroying') return;
+        determineImages(controller);
+      });
+    }
+  };
+  _exports.default = _default;
+});
+}
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/discourse/connectors/edit-topic/select-thumbnail-connector"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[4,\"if\",[[24,[\"model\",\"sidecar_installed\"]]],null,{\"statements\":[[0,\"  \"],[1,[28,\"select-thumbnail\",null,[[\"topic_id\",\"topic_title\",\"buffered\"],[[24,[\"model\",\"id\"]],[24,[\"model\",\"title\"]],[24,[\"buffered\"]]]]],false],[0,\"\\n\"]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/discourse/connectors/user-activity-bottom/portfolio-list"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[4,\"if\",[[24,[\"portfolioEnabled\"]]],null,{\"statements\":[[4,\"link-to\",null,[[\"route\"],[\"userActivity.portfolio\"]],{\"statements\":[[0,\"    \"],[1,[28,\"d-icon\",[\"images\"],null],false],[0,\" \"],[1,[28,\"theme-i18n\",[12,\"user_activity_portfolio_title\"],null],false],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+if ('define' in window) {
+define("discourse/theme-12/connectors/user-activity-bottom/portfolio-list", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = {
+    setupComponent: function setupComponent(attrs, component) {
+      component.set('portfolioEnabled', settings.topic_list_portfolio);
+    }
+  };
+  _exports.default = _default;
+});
+}
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/discourse/connectors/user-card-additional-controls/portfolio-button"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[4,\"if\",[[24,[\"portfolioEnabled\"]]],null,{\"statements\":[[0,\"    \"],[7,\"div\",true],[10,\"class\",\"portfolio-button-inner\"],[8],[0,\"\\n\"],[4,\"link-to\",null,[[\"route\",\"model\"],[\"userActivity.portfolio\",[24,[\"user\"]]]],{\"statements\":[[0,\"        \"],[7,\"svg\",true],[10,\"class\",\"fa d-icon d-icon-images svg-icon svg-string\"],[10,\"xmlns\",\"http://www.w3.org/2000/svg\",\"http://www.w3.org/2000/xmlns/\"],[8],[7,\"use\",true],[10,\"xlink:href\",\"#images\",\"http://www.w3.org/1999/xlink\"],[8],[9],[9],[0,\"\\n        \"],[7,\"label\",true],[8],[1,[28,\"theme-i18n\",[12,\"user_activity_portfolio_title\"],null],false],[9],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[9],[0,\"\\n\"]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+if ('define' in window) {
+define("discourse/theme-12/connectors/user-card-additional-controls/portfolio-button", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = {
+    setupComponent: function setupComponent(attrs, component) {
+      component.set('portfolioEnabled', settings.topic_list_portfolio);
+    }
+  };
+  _exports.default = _default;
+});
+}
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/discourse/connectors/user-custom-preferences/tlp-user-preferences"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[4,\"if\",[[24,[\"siteSettings\",\"topic_list_previews_enabled\"]]],null,{\"statements\":[[0,\"  \"],[1,[28,\"tlp-user-preferences\",null,[[\"model\"],[[24,[\"model\"]]]]],false],[0,\"\\n\"]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+if ('define' in window) {
+define("discourse/theme-12/controllers/tlp-thumbnail-selector", ["exports", "discourse-common/utils/decorators", "discourse/mixins/modal-functionality", "discourse/mixins/buffered-content"], function (_exports, _decorators, _modalFunctionality, _bufferedContent) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = Ember.Controller.extend(_modalFunctionality.default, (0, _bufferedContent.bufferedProperty)("model"), {
+    thumbnailList: Ember.computed.oneWay('model.thumbnails'),
+    modal_topic_title: Ember.computed.oneWay('model.topic_title'),
+    buffered: Ember.computed.alias('model.buffered'),
+    actions: {
+      selectThumbnail: function selectThumbnail(image_url, image_upload_id) {
+        var buffered = this.get('buffered');
+        this.set("buffered.user_chosen_thumbnail_url", image_url);
+        this.set("buffered.image_upload_id", image_upload_id);
+        this.send('closeModal');
+      }
+    }
+  });
+
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/helpers/featured-images-enabled", ["exports", "../lib/tlp-utilities"], function (_exports, _tlpUtilities) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = Ember.Helper.helper(function (params) {
+    return (0, _tlpUtilities.featuredImagesEnabled)(params[0], params[1]);
+  });
+
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/helpers/preview-helpers", ["discourse-common/lib/helpers", "../lib/tlp-utilities", "handlebars"], function (_helpers, _tlpUtilities, _handlebars) {
+  "use strict";
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  (0, _helpers.registerUnbound)('preview-unbound', function (thumbnails, params) {
+    return new _handlebars.default.SafeString((0, _tlpUtilities.renderUnboundPreview)(thumbnails, params));
+  });
+  (0, _helpers.registerUnbound)('list-button', function (button, params) {
+    return new _handlebars.default.SafeString((0, _tlpUtilities.buttonHTML)(button, params));
+  });
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/initializers/preview-edits", ["exports", "discourse-common/utils/decorators", "@ember/object/computed", "discourse/lib/url", "../lib/tlp-utilities", "../lib/actions", "discourse/lib/plugin-api", "discourse/raw-views/list/posts-count-column", "../lib/gridupdate", "discourse/models/topic", "discourse/lib/load-script", "discourse/lib/text", "@ember/runloop", "@ember/service", "@ember/object", "@ember/template", "discourse-common/lib/raw-handlebars-helpers", "discourse-common/lib/raw-templates"], function (_exports, _decorators, _computed, _url, _tlpUtilities, _actions, _pluginApi, _postsCountColumn, _gridupdate, _topic, _loadScript, _text, _runloop, _service, _object, _template, _rawHandlebarsHelpers, _rawTemplates) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var PLUGIN_ID = "topic-list-previews-tc";
+  var _default = {
+    name: "preview-edits",
+    initialize: function initialize(container) {
+      (0, _pluginApi.withPluginApi)("0.8.40", function (api) {
+        var _dec, _obj, _dec2, _obj2, _dec3, _dec4, _dec5, _dec6, _dec7, _obj3, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _obj4, _dec17, _dec18, _obj5;
+
+        api.onPageChange(function () {
+          (0, _loadScript.default)("https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js").then(function () {
+            if (document.querySelector(".tiles-style")) {
+              imagesLoaded(document.querySelector(".tiles-style"), (0, _gridupdate.resizeAllGridItems)());
+            }
+          });
+        });
+        api.modifyClass("component:load-more", {
+          pluginId: PLUGIN_ID,
+          init: function init() {
+            this._super.apply(this, arguments);
+
+            if (this.class == "paginated-topics-list") {
+              this.set("eyelineSelector", ".topic-list-item");
+            } else {
+              this.set("eyelineSelector", this.selector);
+            }
+          }
+        });
+        api.modifyClass("component:basic-topic-list", (_dec = (0, _decorators.default)("listChanged"), (_obj = {
+          pluginId: PLUGIN_ID,
+          topicListPreviewsService: (0, _service.inject)("topic-list-previews"),
+          classNameBindings: ["hasThumbnails:showThumbnail", "hasTiles:tiles-style", "hasExcerpts:showExcerpt", "hasActions:showActions"],
+          hasThumbnails: (0, _computed.readOnly)("topicListPreviewsService.displayThumbnails"),
+          hasTiles: (0, _computed.readOnly)("topicListPreviewsService.displayTiles"),
+          hasExcerpts: (0, _computed.readOnly)("topicListPreviewsService.displayExcerpts"),
+          hasActions: (0, _computed.readOnly)("topicListPreviewsService.displayActions"),
+          currentRoute: (0, _computed.alias)("router.currentRouteName"),
+          listChanged: false,
+          skipHeader: function skipHeader() {
+            this.get("tilesStyle") || this.get("site.mobileView");
+          },
+          tilesStyle: function tilesStyle() {
+            this._settingEnabled("topic_list_tiles");
+          }
+        }, (_applyDecoratedDescriptor(_obj, "tilesStyle", [_dec], Object.getOwnPropertyDescriptor(_obj, "tilesStyle"), _obj)), _obj)));
+        api.modifyClass("component:discovery-topics-list", (_dec2 = (0, _decorators.default)("incomingCount"), (_obj2 = {
+          pluginId: PLUGIN_ID,
+          classNameBindings: ["hasMore:has-more"],
+          incomingCount: 0,
+          hasMore: function hasMore(incomingCount) {
+            return incomingCount > 0;
+          }
+        }, (_applyDecoratedDescriptor(_obj2, "hasMore", [_dec2], Object.getOwnPropertyDescriptor(_obj2, "hasMore"), _obj2)), _obj2)));
+        api.modifyClass("component:topic-list", (_dec3 = (0, _decorators.on)("init"), _dec4 = (0, _decorators.on)("didRender"), _dec5 = (0, _decorators.on)("didInsertElement"), _dec6 = (0, _decorators.observes)("currentRoute"), _dec7 = (0, _decorators.default)("listChanged"), (_obj3 = {
+          pluginId: PLUGIN_ID,
+          topicListPreviewsService: (0, _service.inject)("topic-list-previews"),
+          classNameBindings: ["hasThumbnails:showThumbnail", "hasTiles:tiles-style", "hasExcerpts:showExcerpt", "hasActions:showActions"],
+          hasThumbnails: (0, _computed.readOnly)("topicListPreviewsService.displayThumbnails"),
+          hasTiles: (0, _computed.readOnly)("topicListPreviewsService.displayTiles"),
+          hasExcerpts: (0, _computed.readOnly)("topicListPreviewsService.displayExcerpts"),
+          hasActions: (0, _computed.readOnly)("topicListPreviewsService.displayActions"),
+          listChanged: false,
+          setup: function setup() {
+            var suggestedList = this.get("suggestedList");
+
+            if (suggestedList) {
+              var category = this.get("parentView.parentView.parentView.topic.category");
+              this.set("category", category);
+            }
+          },
+          completeRender: function completeRender() {
+            if (this.get("hasTiles")) {
+              Ember.run.scheduleOnce("afterRender", this, this.applyTiles);
+            }
+          },
+          setupListChanged: function setupListChanged() {
+            this.toggleProperty("listChanged");
+          },
+          thumbnailFirstXRows: function thumbnailFirstXRows() {
+            return settings.topic_list_thumbnail_first_x_rows;
+          },
+          applyTiles: function applyTiles() {
+            (0, _gridupdate.resizeAllGridItems)();
+          }
+        }, (_applyDecoratedDescriptor(_obj3, "setup", [_dec3], Object.getOwnPropertyDescriptor(_obj3, "setup"), _obj3), _applyDecoratedDescriptor(_obj3, "completeRender", [_dec4], Object.getOwnPropertyDescriptor(_obj3, "completeRender"), _obj3), _applyDecoratedDescriptor(_obj3, "setupListChanged", [_dec5, _dec6], Object.getOwnPropertyDescriptor(_obj3, "setupListChanged"), _obj3), _applyDecoratedDescriptor(_obj3, "thumbnailFirstXRows", [_dec7], Object.getOwnPropertyDescriptor(_obj3, "thumbnailFirstXRows"), _obj3)), _obj3)));
+        api.modifyClass("component:topic-list-item", (_dec8 = (0, _decorators.on)("init"), _dec9 = (0, _decorators.on)("didInsertElement"), _dec10 = (0, _decorators.observes)("thumbnails", "bulkSelectEnabled", "topic.pinned", "likeDifference", "showThumbnail", "tilesStyle", "showExcerpt", "showActions"), _dec11 = (0, _decorators.default)(), _dec12 = (0, _decorators.default)(), _dec13 = (0, _decorators.default)("tilesStyle", "thumbnailWidth", "thumbnailHeight"), _dec14 = (0, _decorators.default)("likeCount"), _dec15 = (0, _decorators.default)("hasLiked"), _dec16 = (0, _decorators.default)("category", "topic.isPinnedUncategorized"), (_obj4 = {
+          pluginId: PLUGIN_ID,
+          topicListPreviewsService: (0, _service.inject)("topic-list-previews"),
+          canBookmark: Ember.computed.bool("currentUser"),
+          tilesStyle: (0, _computed.readOnly)("topicListPreviewsService.displayTiles"),
+          notTilesStyle: (0, _computed.not)("topicListPreviewsService.displayTiles"),
+          showThumbnail: (0, _computed.readOnly)("topicListPreviewsService.displayThumbnails"),
+          showExcerpt: (0, _computed.readOnly)("topicListPreviewsService.displayExcerpts"),
+          showActions: (0, _computed.and)("topic.sidecar_installed", "topicListPreviewsService.displayActions"),
+          thumbnailFirstXRows: (0, _computed.alias)("parentView.thumbnailFirstXRows"),
+          category: (0, _computed.alias)("parentView.category"),
+          thumbnails: (0, _computed.alias)("topic.thumbnails"),
+          hasThumbnail: false,
+          likeCount: 0,
+          hasLiked: false,
+          canUnlike: true,
+          _setupProperties: function _setupProperties() {
+            var _this = this;
+
+            var topic = this.get("topic");
+            var thumbnails = topic.get("thumbnails");
+            var currentUser = this.get("currentUser");
+            var defaultThumbnail = this.get("defaultThumbnail");
+            this.set("likeCount", topic.like_count);
+            this.set("hasLiked", topic.topic_post_liked);
+            this.set("canUnlike", topic.topic_post_can_unlike);
+            this.set("hasThumbnail", this.get("thumbnails") && this.get("showThumbnail"));
+
+            if (this.get("tilesStyle")) {
+              // needs 'div's for masonry
+              this.set("tagName", "div");
+              this.set("classNames", this.classNames.concat("tiles-grid-item"));
+
+              if (settings.topic_list_tiles_larger_featured_tiles && topic.tags) {
+                if (topic.tags.filter(function (tag) {
+                  return _this.get("featuredTags").indexOf(tag) > -1;
+                })[0]) {
+                  this.set("classNames", this.classNames.concat("tiles-grid-item-width2"));
+                }
+              }
+
+              var raw = topic.excerpt;
+              (0, _text.cookAsync)(raw).then(function (cooked) {
+                return _this.set("excerpt", cooked);
+              });
+            }
+
+            if (thumbnails) {
+              (0, _tlpUtilities.testImageUrl)(thumbnails, currentUser, function (imageLoaded) {
+                if (!imageLoaded) {
+                  Ember.run.scheduleOnce("afterRender", _this, function () {
+                    if (defaultThumbnail) {
+                      var thumbnailElement = _this.element.querySelector("img.thumbnail");
+
+                      if (thumbnailElement) thumbnailElement.src = defaultThumbnail;
+                    } else {
+                      var containerElement = _this.element.querySelector(".topic-thumbnail");
+
+                      if (containerElement) containerElement.style.display = "none";
+                    }
+                  });
+                }
+              });
+            } else if (defaultThumbnail && settings.topic_list_default_thumbnail_fallback) {
+              this.set("thumbnails", [{
+                url: defaultThumbnail
+              }]);
+            }
+
+            var obj = _postsCountColumn.default.create({
+              topic: topic
+            });
+
+            obj.siteSettings = settings;
+            this.set("likesHeat", obj.get("likesHeat"));
+          },
+          _setupDOM: function _setupDOM() {
+            var thumbnails = this.get("topic").get("thumbnails");
+            var thumbnailFirstXRows = this.get("thumbnailFirstXRows");
+
+            if (thumbnails && thumbnailFirstXRows) {
+              var parent = this.element.parentNode;
+              var index = Array.prototype.indexOf.call(parent.children, this.element);
+
+              if (index > thumbnailFirstXRows) {
+                this.set("hasThumbnail", false);
+                this.renderTopicListItem();
+              }
+            }
+
+            this._afterRender();
+          },
+          _reRender: function _reRender() {
+            this.set("hasThumbnail", this.get("thumbnails") && this.get("showThumbnail"));
+            this.renderTopicListItem();
+
+            this._afterRender();
+          },
+          _afterRender: function _afterRender() {
+            var _this2 = this;
+
+            Ember.run.scheduleOnce("afterRender", this, function () {
+              if (_this2.get("showActions")) {
+                _this2._setupActions();
+              }
+            });
+          },
+          featuredTags: function featuredTags() {
+            return settings.topic_list_featured_images_tag.split("|");
+          },
+          _setupActions: function _setupActions() {
+            var _this3 = this;
+
+            if (this._state === "destroying") return;
+            var postId = this.get("topic.topic_post_id"),
+                bookmarkElement = this.element.querySelector(".topic-bookmark"),
+                likeElement = this.element.querySelector(".topic-like");
+
+            var debouncedToggleBookmark = function () {
+              _this3.debouncedToggleBookmark(_this3);
+            }.bind(this);
+
+            var debouncedToggleLike = function () {
+              _this3.debouncedToggleLike(_this3);
+            }.bind(this);
+
+            if (bookmarkElement) {
+              bookmarkElement.addEventListener("click", debouncedToggleBookmark);
+            }
+
+            if (likeElement) {
+              likeElement.addEventListener("click", debouncedToggleLike);
+            }
+          },
+          expandPinned: function expandPinned() {
+            if (this.get("showExcerpt")) {
+              return true;
+            }
+
+            return this._super();
+          },
+          posterNames: function posterNames() {
+            var posters = this.get("topic.posters");
+            var posterNames = "";
+            posters.forEach(function (poster, i) {
+              var name = poster.user.name ? poster.user.name : poster.user.username;
+              posterNames += '<a href="' + poster.user.path + '" data-user-card="' + poster.user.username + '" + class="' + poster.extras + '">' + name + "</a>";
+
+              if (i === posters.length - 2) {
+                posterNames += "<span> & </span>";
+              } else if (i !== posters.length - 1) {
+                posterNames += "<span>, </span>";
+              }
+            });
+            return posterNames;
+          },
+          defaultThumbnail: function defaultThumbnail() {
+            return (0, _tlpUtilities.getDefaultThumbnail)();
+          },
+          thumbnailOpts: function thumbnailOpts(tilesStyle, thumbnailWidth, thumbnailHeight) {
+            var opts = {
+              tilesStyle: tilesStyle
+            };
+
+            if (thumbnailWidth) {
+              opts["thumbnailWidth"] = thumbnailWidth;
+            }
+
+            if (thumbnailHeight) {
+              opts["thumbnailHeight"] = thumbnailHeight;
+            }
+
+            return opts;
+          },
+          topicActions: function topicActions(likeCount) {
+            var _this4 = this;
+
+            var actions = [];
+
+            if (likeCount || this.get("topic.topic_post_can_like") || !this.get("currentUser") || settings.topic_list_show_like_on_current_users_posts) {
+              actions.push(this._likeButton());
+            }
+
+            if (this.get("canBookmark")) {
+              actions.push(this._bookmarkButton());
+              Ember.run.scheduleOnce("afterRender", this, function () {
+                var bookmarkStatusElement = _this4.element.querySelector(".topic-statuses .op-bookmark");
+
+                if (bookmarkStatusElement) {
+                  bookmarkStatusElement.style.display = "none";
+                }
+              });
+            }
+
+            return actions;
+          },
+          hasLikedDisplay: function hasLikedDisplay() {
+            var hasLiked = this.get("hasLiked");
+            return hasLiked == null ? this.get("topic.topic_post_liked") : hasLiked;
+          },
+          showCategoryBadge: function showCategoryBadge(category, isPinnedUncategorized) {
+            var isTopic = typeof topic !== "undefined";
+            return (isTopic || !category || category.has_children) && !isPinnedUncategorized;
+          },
+          _likeButton: function _likeButton() {
+            var classes = "topic-like";
+            var disabled = this.get("topic.topic_post_is_current_users");
+
+            if (this.get("hasLiked")) {
+              classes += " has-like";
+              disabled = disabled ? true : !this.get("canUnlike");
+            }
+
+            return {
+              type: "like",
+              class: classes,
+              title: "post.controls.like",
+              icon: "heart",
+              disabled: disabled,
+              topic_id: this.topic.id,
+              topic_post_id: this.topic.topic_post_id,
+              like_count: this.likeCount,
+              has_liked: this.hasLiked
+            };
+          },
+          _bookmarkButton: function _bookmarkButton() {
+            var classes = "topic-bookmark",
+                title = "bookmarks.not_bookmarked";
+
+            if (this.get("topic.topic_post_bookmarked")) {
+              classes += " bookmarked";
+              title = "bookmarks.created";
+            }
+
+            return {
+              type: "bookmark",
+              class: classes,
+              title: title,
+              icon: "bookmark",
+              topic_id: this.topic.id,
+              topic_post_id: this.topic.topic_post_id
+            };
+          },
+          // Action toggles and server methods
+          debouncedToggleBookmark: function debouncedToggleBookmark() {
+            var _this5 = this;
+
+            Ember.run.debounce(this, function () {
+              (0, _actions.sendBookmark)(_this5.topic.id, _this5.topic.topic_post_id, !_this5.topic.bookmarked);
+              _this5.topic.bookmarked = !_this5.topic.bookmarked;
+
+              var bookmarkElement = _this5.element.querySelector(".topic-bookmark");
+
+              bookmarkElement.classList.toggle("bookmarked");
+            }, 500);
+          },
+          debouncedToggleLike: function debouncedToggleLike() {
+            var _this6 = this;
+
+            if (this.get("currentUser")) {
+              Ember.run.debounce(this, function () {
+                var change = 0;
+
+                if (_this6.get("hasLiked")) {
+                  (0, _actions.removeLike)(_this6.topic.topic_post_id);
+                  change = -1;
+                } else {
+                  (0, _actions.addLike)(_this6.topic.topic_post_id);
+                  change = 1;
+
+                  _this6.set("canUnlike", true); //TODO improve this so it doesn't update UI upon failure to like
+                  //TODO add back animation?
+
+                }
+
+                var newText = "";
+
+                var count = _this6.get("likeCount");
+
+                var newCount = (count || 0) + (change || 0);
+
+                _this6.set("hasLiked", !_this6.get("hasLiked"));
+
+                _this6.set("topic.topic_post_like_count", newCount);
+
+                _this6.set("likeCount", newCount);
+
+                _this6.renderTopicListItem();
+
+                _this6._afterRender();
+              }, 500);
+            } else {
+              var controller = container.lookup("controller:application");
+              controller.send("showLogin");
+            }
+          }
+        }, (_applyDecoratedDescriptor(_obj4, "_setupProperties", [_dec8], Object.getOwnPropertyDescriptor(_obj4, "_setupProperties"), _obj4), _applyDecoratedDescriptor(_obj4, "_setupDOM", [_dec9], Object.getOwnPropertyDescriptor(_obj4, "_setupDOM"), _obj4), _applyDecoratedDescriptor(_obj4, "_reRender", [_dec10], Object.getOwnPropertyDescriptor(_obj4, "_reRender"), _obj4), _applyDecoratedDescriptor(_obj4, "featuredTags", [_decorators.default], Object.getOwnPropertyDescriptor(_obj4, "featuredTags"), _obj4), _applyDecoratedDescriptor(_obj4, "expandPinned", [_dec11], Object.getOwnPropertyDescriptor(_obj4, "expandPinned"), _obj4), _applyDecoratedDescriptor(_obj4, "posterNames", [_dec12], Object.getOwnPropertyDescriptor(_obj4, "posterNames"), _obj4), _applyDecoratedDescriptor(_obj4, "defaultThumbnail", [_decorators.default], Object.getOwnPropertyDescriptor(_obj4, "defaultThumbnail"), _obj4), _applyDecoratedDescriptor(_obj4, "thumbnailOpts", [_dec13], Object.getOwnPropertyDescriptor(_obj4, "thumbnailOpts"), _obj4), _applyDecoratedDescriptor(_obj4, "topicActions", [_dec14], Object.getOwnPropertyDescriptor(_obj4, "topicActions"), _obj4), _applyDecoratedDescriptor(_obj4, "hasLikedDisplay", [_dec15], Object.getOwnPropertyDescriptor(_obj4, "hasLikedDisplay"), _obj4), _applyDecoratedDescriptor(_obj4, "showCategoryBadge", [_dec16], Object.getOwnPropertyDescriptor(_obj4, "showCategoryBadge"), _obj4)), _obj4)));
+        api.modifyClass("component:topic-timeline", (_dec17 = (0, _decorators.on)("didInsertElement"), _dec18 = (0, _decorators.on)("willDestroyElement"), (_obj5 = {
+          pluginId: PLUGIN_ID,
+          refreshTimelinePosition: function refreshTimelinePosition() {
+            var _this7 = this;
+
+            this.appEvents.on("topic:refresh-timeline-position", this, function () {
+              return _this7.queueDockCheck();
+            });
+          },
+          removeRefreshTimelinePosition: function removeRefreshTimelinePosition() {
+            var _this8 = this;
+
+            try {
+              this.appEvents.off("topic:refresh-timeline-position", this, function () {
+                return _this8.queueDockCheck();
+              });
+            } catch (err) {
+              console.log(err.message);
+            }
+          }
+        }, (_applyDecoratedDescriptor(_obj5, "refreshTimelinePosition", [_dec17], Object.getOwnPropertyDescriptor(_obj5, "refreshTimelinePosition"), _obj5), _applyDecoratedDescriptor(_obj5, "removeRefreshTimelinePosition", [_dec18], Object.getOwnPropertyDescriptor(_obj5, "removeRefreshTimelinePosition"), _obj5)), _obj5)));
+      });
+    }
+  };
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/initializers/preview-route-edits", ["exports", "../lib/tlp-utilities", "discourse/lib/ajax", "discourse/lib/plugin-api", "discourse/lib/preload-store", "discourse/models/category-list", "discourse/models/topic-list", "discourse/lib/cached-topic-list"], function (_exports, _tlpUtilities, _ajax, _pluginApi, _preloadStore, _categoryList, _topicList, _cachedTopicList) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var PLUGIN_ID = "topic-list-previews-tc";
+  var _default = {
+    name: 'preview-route-edits',
+    initialize: function initialize(container) {
+      var site = container.lookup('site:main');
+      var discoveryTopicRoutes = [];
+      var discoveryCategoryRoutes = ['Category', 'CategoryNone'];
+      var filters = site.get('filters');
+      var topIndex = filters.indexOf('top');
+
+      if (topIndex > -1) {
+        filters.splice(topIndex, 1);
+      }
+
+      filters.forEach(function (filter) {
+        var filterCapitalized = filter.capitalize();
+        discoveryTopicRoutes.push(filterCapitalized);
+        discoveryCategoryRoutes.push.apply(discoveryCategoryRoutes, ["".concat(filterCapitalized, "Category"), "".concat(filterCapitalized, "CategoryNone")]);
+      });
+      discoveryTopicRoutes.forEach(function (route) {
+        var route = container.lookup("route:discovery.".concat(route));
+        route.reopen({
+          model: function model(data, transition) {
+            var _this = this;
+
+            return this._super(data, transition).then(function (result) {
+              if (settings.topic_list_featured_images) {
+                var featuredTopics = null;
+                var filter = "tag/".concat(settings.topic_list_featured_images_tag);
+                var lastTopicList = (0, _cachedTopicList.findOrResetCachedTopicList)(_this.session, filter);
+
+                _this.store.findFiltered('topicList', {
+                  filter: filter
+                }).then(function (list) {
+                  _this.setProperties({
+                    featuredTopics: Ember.Object.create(list)
+                  });
+
+                  _this.controllerFor('discovery').set('featuredTopics', _this.featuredTopics);
+                });
+              }
+
+              return result;
+            });
+          }
+        });
+      });
+      discoveryCategoryRoutes.forEach(function (route) {
+        var route = container.lookup("route:discovery.".concat(route));
+        route.reopen({
+          afterModel: function afterModel(model, transition) {
+            var _this2 = this;
+
+            return this._super(model, transition).then(function (result) {
+              if (settings.topic_list_featured_images_category) {
+                var featuredTopics = null;
+                var filter = "tag/".concat(settings.topic_list_featured_images_tag);
+                var lastTopicList = (0, _cachedTopicList.findOrResetCachedTopicList)(_this2.session, filter);
+
+                _this2.store.findFiltered('topicList', {
+                  filter: filter
+                }).then(function (list) {
+                  _this2.setProperties({
+                    featuredTopics: Ember.Object.create(list)
+                  });
+
+                  _this2.controllerFor('discovery').set('featuredTopics', _this2.featuredTopics);
+                });
+              }
+
+              return result;
+            });
+          }
+        });
+      });
+      (0, _pluginApi.withPluginApi)('0.8.12', function (api) {
+        api.modifyClass("route:discovery-categories", {
+          pluginId: PLUGIN_ID,
+          setFeaturedTopics: function setFeaturedTopics(topicList) {
+            var _this3 = this;
+
+            var featuredTopics = null;
+            var filter = "tag/".concat(settings.topic_list_featured_images_tag);
+            var lastTopicList = (0, _cachedTopicList.findOrResetCachedTopicList)(this.session, filter);
+            this.store.findFiltered('topicList', {
+              filter: filter
+            }).then(function (list) {
+              _this3.setProperties({
+                featuredTopics: Ember.Object.create(list)
+              });
+
+              _this3.controllerFor('discovery').set('featuredTopics', _this3.featuredTopics);
+            });
+          },
+          // unfortunately we have to override this whole method to extract the featured topics
+          _findCategoriesAndTopics: function _findCategoriesAndTopics(filter) {
+            var _this4 = this;
+
+            return Ember.RSVP.hash({
+              wrappedCategoriesList: _preloadStore.default.getAndRemove("categories_list"),
+              topicsList: _preloadStore.default.getAndRemove("topic_list_".concat(filter))
+            }).then(function (hash) {
+              var wrappedCategoriesList = hash.wrappedCategoriesList,
+                  topicsList = hash.topicsList;
+              var categoriesList = wrappedCategoriesList && wrappedCategoriesList.category_list;
+
+              if (categoriesList && topicsList) {
+                _this4.setFeaturedTopics(topicsList);
+
+                return Ember.Object.create({
+                  categories: _categoryList.default.categoriesFrom(_this4.store, wrappedCategoriesList),
+                  topics: _topicList.default.topicsFrom(_this4.store, topicsList),
+                  can_create_category: categoriesList.can_create_category,
+                  can_create_topic: categoriesList.can_create_topic,
+                  loadBefore: _this4._loadBefore(_this4.store),
+                  draft_key: categoriesList.draft_key,
+                  draft: categoriesList.draft,
+                  draft_sequence: categoriesList.draft_sequence
+                });
+              } // Otherwise, return the ajax result
+
+
+              return (0, _ajax.ajax)("/categories_and_".concat(filter)).then(function (result) {
+                return Ember.Object.create({
+                  categories: _categoryList.default.categoriesFrom(_this4.store, result),
+                  topics: _topicList.default.topicsFrom(_this4.store, result),
+                  can_create_category: result.category_list.can_create_category,
+                  can_create_topic: result.category_list.can_create_topic,
+                  loadBefore: _this4._loadBefore(_this4.store),
+                  draft_key: result.category_list.draft_key,
+                  draft: result.category_list.draft,
+                  draft_sequence: result.category_list.draft_sequence
+                });
+              });
+            });
+          }
+        });
+      });
+    }
+  };
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/lib/actions", ["exports", "discourse/lib/ajax", "discourse/lib/ajax-error"], function (_exports, _ajax, _ajaxError) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.removeLike = _exports.sendBookmark = _exports.addLike = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var addLike = function addLike(postId) {
+    (0, _ajax.ajax)("/post_actions", {
+      type: "POST",
+      data: {
+        id: postId,
+        post_action_type_id: 2
+      },
+      returnXHR: true
+    }).catch(function (error) {
+      (0, _ajaxError.popupAjaxError)(error);
+    });
+  };
+
+  _exports.addLike = addLike;
+
+  var sendBookmark = function sendBookmark(topic_id, topic_post_id, bookmarked) {
+    if (bookmarked) {
+      var data = {
+        reminder_type: null,
+        reminder_at: null,
+        name: null,
+        post_id: topic_post_id
+      };
+      return (0, _ajax.ajax)("/bookmarks", {
+        type: "POST",
+        data: data
+      }).catch(function (error) {
+        (0, _ajaxError.popupAjaxError)(error);
+      });
+    } else {
+      return (0, _ajax.ajax)("/t/".concat(topic_id, "/remove_bookmarks"), {
+        type: "PUT"
+      }).catch(function (error) {
+        (0, _ajaxError.popupAjaxError)(error);
+      });
+    }
+  };
+
+  _exports.sendBookmark = sendBookmark;
+
+  var removeLike = function removeLike(postId) {
+    (0, _ajax.ajax)("/post_actions/" + postId, {
+      type: "DELETE",
+      data: {
+        post_action_type_id: 2
+      }
+    }).catch(function (error) {
+      (0, _ajaxError.popupAjaxError)(error);
+    });
+  };
+
+  _exports.removeLike = removeLike;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/lib/gridupdate", ["exports", "discourse/lib/load-script"], function (_exports, _loadScript) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.resizeAllGridItems = resizeAllGridItems;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  window.addEventListener('resize', resizeAllGridItems);
+  window.addEventListener('scroll', resizeAllGridItems);
+
+  function resizeGridItem(item, grid, rowHeight, rowGap) {
+    (0, _loadScript.default)('https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js').then(function () {
+      imagesLoaded(item, function () {
+        var contentHeight = item.childNodes[1].getBoundingClientRect().height;
+        var rowSpan = Math.ceil((contentHeight + rowGap) / (rowHeight + rowGap));
+        item.style.gridRowEnd = 'span ' + rowSpan;
+      });
+    });
+  }
+
+  function resizeAllGridItems() {
+    var allItems = document.getElementsByClassName('tiles-grid-item');
+    var grid = false;
+    grid = document.getElementsByTagName('tbody')[0];
+
+    if (!grid) {
+      return;
+    }
+
+    var rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+    var rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+
+    for (var x = 0; x < allItems.length; x++) {
+      resizeGridItem(allItems[x], grid, rowHeight, rowGap);
+    }
+  }
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/lib/imagesloaded", [], function () {
+  "use strict";
+
+  function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return !!right[Symbol.hasInstance](left); } else { return left instanceof right; } }
+
+  function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+  /*!
+   * imagesLoaded PACKAGED v4.1.4
+   * JavaScript is all like "You images are done yet or what?"
+   * MIT License
+   */
+
+
+  !function (e, t) {
+    "function" == typeof define && define.amd ? define("ev-emitter/ev-emitter", t) : "object" == (typeof module === "undefined" ? "undefined" : _typeof(module)) && module.exports ? module.exports = t() : e.EvEmitter = t();
+  }("undefined" != typeof window ? window : void 0, function () {
+    function e() {}
+
+    var t = e.prototype;
+    return t.on = function (e, t) {
+      if (e && t) {
+        var i = this._events = this._events || {},
+            n = i[e] = i[e] || [];
+        return n.indexOf(t) == -1 && n.push(t), this;
+      }
+    }, t.once = function (e, t) {
+      if (e && t) {
+        this.on(e, t);
+        var i = this._onceEvents = this._onceEvents || {},
+            n = i[e] = i[e] || {};
+        return n[t] = !0, this;
+      }
+    }, t.off = function (e, t) {
+      var i = this._events && this._events[e];
+
+      if (i && i.length) {
+        var n = i.indexOf(t);
+        return n != -1 && i.splice(n, 1), this;
+      }
+    }, t.emitEvent = function (e, t) {
+      var i = this._events && this._events[e];
+
+      if (i && i.length) {
+        i = i.slice(0), t = t || [];
+
+        for (var n = this._onceEvents && this._onceEvents[e], o = 0; o < i.length; o++) {
+          var r = i[o],
+              s = n && n[r];
+          s && (this.off(e, r), delete n[r]), r.apply(this, t);
+        }
+
+        return this;
+      }
+    }, t.allOff = function () {
+      delete this._events, delete this._onceEvents;
+    }, e;
+  }), function (e, t) {
+    "use strict";
+
+    "function" == typeof define && define.amd ? define(["ev-emitter/ev-emitter"], function (i) {
+      return t(e, i);
+    }) : "object" == (typeof module === "undefined" ? "undefined" : _typeof(module)) && module.exports ? module.exports = t(e, require("ev-emitter")) : e.imagesLoaded = t(e, e.EvEmitter);
+  }("undefined" != typeof window ? window : void 0, function (e, t) {
+    function i(e, t) {
+      for (var i in t) {
+        e[i] = t[i];
+      }
+
+      return e;
+    }
+
+    function n(e) {
+      if (Array.isArray(e)) return e;
+      var t = "object" == _typeof(e) && "number" == typeof e.length;
+      return t ? d.call(e) : [e];
+    }
+
+    function o(e, t, r) {
+      if (!_instanceof(this, o)) return new o(e, t, r);
+      var s = e;
+      return "string" == typeof e && (s = document.querySelectorAll(e)), s ? (this.elements = n(s), this.options = i({}, this.options), "function" == typeof t ? r = t : i(this.options, t), r && this.on("always", r), this.getImages(), h && (this.jqDeferred = new h.Deferred()), void setTimeout(this.check.bind(this))) : void a.error("Bad element for imagesLoaded " + (s || e));
+    }
+
+    function r(e) {
+      this.img = e;
+    }
+
+    function s(e, t) {
+      this.url = e, this.element = t, this.img = new Image();
+    }
+
+    var h = e.jQuery,
+        a = e.console,
+        d = Array.prototype.slice;
+    o.prototype = Object.create(t.prototype), o.prototype.options = {}, o.prototype.getImages = function () {
+      this.images = [], this.elements.forEach(this.addElementImages, this);
+    }, o.prototype.addElementImages = function (e) {
+      "IMG" == e.nodeName && this.addImage(e), this.options.background === !0 && this.addElementBackgroundImages(e);
+      var t = e.nodeType;
+
+      if (t && u[t]) {
+        for (var i = e.querySelectorAll("img"), n = 0; n < i.length; n++) {
+          var o = i[n];
+          this.addImage(o);
+        }
+
+        if ("string" == typeof this.options.background) {
+          var r = e.querySelectorAll(this.options.background);
+
+          for (n = 0; n < r.length; n++) {
+            var s = r[n];
+            this.addElementBackgroundImages(s);
+          }
+        }
+      }
+    };
+    var u = {
+      1: !0,
+      9: !0,
+      11: !0
+    };
+    return o.prototype.addElementBackgroundImages = function (e) {
+      var t = getComputedStyle(e);
+      if (t) for (var i = /url\((['"])?(.*?)\1\)/gi, n = i.exec(t.backgroundImage); null !== n;) {
+        var o = n && n[2];
+        o && this.addBackground(o, e), n = i.exec(t.backgroundImage);
+      }
+    }, o.prototype.addImage = function (e) {
+      var t = new r(e);
+      this.images.push(t);
+    }, o.prototype.addBackground = function (e, t) {
+      var i = new s(e, t);
+      this.images.push(i);
+    }, o.prototype.check = function () {
+      function e(e, i, n) {
+        setTimeout(function () {
+          t.progress(e, i, n);
+        });
+      }
+
+      var t = this;
+      return this.progressedCount = 0, this.hasAnyBroken = !1, this.images.length ? void this.images.forEach(function (t) {
+        t.once("progress", e), t.check();
+      }) : void this.complete();
+    }, o.prototype.progress = function (e, t, i) {
+      this.progressedCount++, this.hasAnyBroken = this.hasAnyBroken || !e.isLoaded, this.emitEvent("progress", [this, e, t]), this.jqDeferred && this.jqDeferred.notify && this.jqDeferred.notify(this, e), this.progressedCount == this.images.length && this.complete(), this.options.debug && a && a.log("progress: " + i, e, t);
+    }, o.prototype.complete = function () {
+      var e = this.hasAnyBroken ? "fail" : "done";
+
+      if (this.isComplete = !0, this.emitEvent(e, [this]), this.emitEvent("always", [this]), this.jqDeferred) {
+        var t = this.hasAnyBroken ? "reject" : "resolve";
+        this.jqDeferred[t](this);
+      }
+    }, r.prototype = Object.create(t.prototype), r.prototype.check = function () {
+      var e = this.getIsImageComplete();
+      return e ? void this.confirm(0 !== this.img.naturalWidth, "naturalWidth") : (this.proxyImage = new Image(), this.proxyImage.addEventListener("load", this), this.proxyImage.addEventListener("error", this), this.img.addEventListener("load", this), this.img.addEventListener("error", this), void (this.proxyImage.src = this.img.src));
+    }, r.prototype.getIsImageComplete = function () {
+      return this.img.complete && this.img.naturalWidth;
+    }, r.prototype.confirm = function (e, t) {
+      this.isLoaded = e, this.emitEvent("progress", [this, this.img, t]);
+    }, r.prototype.handleEvent = function (e) {
+      var t = "on" + e.type;
+      this[t] && this[t](e);
+    }, r.prototype.onload = function () {
+      this.confirm(!0, "onload"), this.unbindEvents();
+    }, r.prototype.onerror = function () {
+      this.confirm(!1, "onerror"), this.unbindEvents();
+    }, r.prototype.unbindEvents = function () {
+      this.proxyImage.removeEventListener("load", this), this.proxyImage.removeEventListener("error", this), this.img.removeEventListener("load", this), this.img.removeEventListener("error", this);
+    }, s.prototype = Object.create(r.prototype), s.prototype.check = function () {
+      this.img.addEventListener("load", this), this.img.addEventListener("error", this), this.img.src = this.url;
+      var e = this.getIsImageComplete();
+      e && (this.confirm(0 !== this.img.naturalWidth, "naturalWidth"), this.unbindEvents());
+    }, s.prototype.unbindEvents = function () {
+      this.img.removeEventListener("load", this), this.img.removeEventListener("error", this);
+    }, s.prototype.confirm = function (e, t) {
+      this.isLoaded = e, this.emitEvent("progress", [this, this.element, t]);
+    }, o.makeJQueryPlugin = function (t) {
+      t = t || e.jQuery, t && (h = t, h.fn.imagesLoaded = function (e, t) {
+        var i = new o(this, e, t);
+        return i.jqDeferred.promise(h(this));
+      });
+    }, o.makeJQueryPlugin(), o;
+  });
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/lib/tlp-utilities", ["exports", "discourse-common/lib/icon-library"], function (_exports, _iconLibrary) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.getDefaultThumbnail = _exports.featuredImagesEnabled = _exports.buttonHTML = _exports.testImageUrl = _exports.renderUnboundPreview = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var isThumbnail = function isThumbnail(path) {
+    return typeof path === "string" && path !== "false" && path !== "nil" && path !== "null" && path !== "";
+  };
+
+  var previewUrl = function previewUrl(thumbnails, currentUser) {
+    var featured = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    var preferLowRes = currentUser !== undefined && currentUser !== null ? currentUser.custom_fields.tlp_user_prefs_prefer_low_res_thumbnails : false;
+
+    if (thumbnails) {
+      var resLevel = featured ? settings.topic_list_featured_images_resolution_level : settings.topic_list_thumbnail_resolution_level;
+      resLevel = Math.round((thumbnails.length - 1) / 6 * resLevel);
+
+      if (preferLowRes) {
+        resLevel++;
+      }
+
+      if (window.devicePixelRatio && resLevel > 0) {
+        resLevel--;
+      }
+
+      return resLevel <= thumbnails.length - 1 ? thumbnails[resLevel].url : thumbnails[thumbnails.length - 1].url;
+    } else {
+      return false;
+    }
+  };
+
+  var renderUnboundPreview = function renderUnboundPreview(thumbnails, params) {
+    var url = previewUrl(thumbnails, params.currentUser, params.opts.featured);
+    if (!url) return "";
+    var opts = params.opts || {};
+
+    if (!opts.tilesStyle && !opts.featured && params.site.mobileView) {
+      return "<img class=\"thumbnail\" src=\"".concat(url, "\" loading=\"lazy\"/>");
+    }
+
+    var attrWidthSuffix = opts.tilesStyle ? "%" : "px";
+    var attrHeightSuffix = opts.tilesStyle ? "" : "px";
+    var css_classes = opts.tilesStyle ? "thumbnail tiles-thumbnail" : "thumbnail";
+    var category_width = params.category ? params.category.topic_list_thumbnail_width : false;
+    var category_height = params.category ? params.category.topic_list_thumbnail_height : false;
+    var featured_width = opts.featured ? settings.topic_list_featured_width ? settings.topic_list_featured_width : "auto" : false;
+    var featured_height = opts.featured ? settings.topic_list_featured_height : false;
+    var tiles_width = opts.tilesStyle ? "100" : false;
+    var tiles_height = opts.tilesStyle ? "auto" : false;
+    var custom_width = opts.thumbnailWidth ? opts.thumbnailWidth : false;
+    var custom_height = opts.thumbnailHeight ? opts.thumbnailHeight : false;
+    var height = custom_height || tiles_height || featured_height || category_height || settings.topic_list_thumbnail_height;
+    var width = custom_width || tiles_width || featured_width || category_width || settings.topic_list_thumbnail_width;
+    var height_style = height ? "height:".concat(height).concat(attrHeightSuffix, ";") : "";
+    var style = "".concat(height_style, "width:").concat(width).concat(attrWidthSuffix);
+    return "<img class=\"".concat(css_classes, "\" src=\"").concat(url, "\" style=\"").concat(style, "\" loading=\"lazy\"/>");
+  };
+
+  _exports.renderUnboundPreview = renderUnboundPreview;
+
+  var testImageUrl = function testImageUrl(thumbnails, currentUser, callback) {
+    var url = previewUrl(thumbnails, currentUser);
+    var timeout = settings.topic_list_test_image_url_timeout;
+    var timer,
+        img = new Image();
+
+    img.onerror = img.onabort = function () {
+      clearTimeout(timer);
+      callback(false);
+    };
+
+    img.onload = function () {
+      clearTimeout(timer);
+      callback(true);
+    };
+
+    timer = setTimeout(function () {
+      callback(false);
+    }, timeout);
+    img.src = url;
+  };
+
+  _exports.testImageUrl = testImageUrl;
+
+  var getDefaultThumbnail = function getDefaultThumbnail() {
+    var defaultThumbnail = settings.topic_list_default_thumbnail;
+    return defaultThumbnail ? defaultThumbnail : false;
+  };
+
+  _exports.getDefaultThumbnail = getDefaultThumbnail;
+
+  var buttonHTML = function buttonHTML(action, topic) {
+    action = action || {};
+    var html = "<button class='list-button " + action.class + "'";
+
+    if (action.title) {
+      html += 'title="' + I18n.t(action.title) + '"';
+    }
+
+    if (action.topic_id) {
+      html += " data-topic_id=".concat(action.topic_id);
+    }
+
+    if (action.topic_post_id) {
+      html += " data-topic_post_id=".concat(action.topic_post_id);
+    }
+
+    if (action.disabled) {
+      html += " disabled=true";
+    }
+
+    if (action.type == "like" && action.like_count > 0) {
+      html += "><span class=\"like-count\">".concat(action.like_count, "</span>").concat((0, _iconLibrary.iconHTML)(action.icon));
+    } else if (action.type == "like" && action.like_count == 0) {
+      html += "><span class=\"like-count\"></span>".concat((0, _iconLibrary.iconHTML)(action.icon));
+    } else {
+      html += ">".concat((0, _iconLibrary.iconHTML)(action.icon));
+    }
+
+    html += "</button>";
+    return html;
+  };
+
+  _exports.buttonHTML = buttonHTML;
+
+  var featuredImagesEnabled = function featuredImagesEnabled() {
+    var category = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    var isTopic = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+    if (isTopic && !settings.topic_list_featured_images_topic) {
+      return false;
+    }
+
+    if (!category || settings.topic_list_featured_images_category) {
+      return settings.topic_list_featured_images;
+    } else {
+      return category.topic_list_featured_images;
+    }
+  };
+
+  _exports.featuredImagesEnabled = featuredImagesEnabled;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/previews-route-map", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = {
+    resource: "user.userActivity",
+    map: function map() {
+      this.route("portfolio");
+    }
+  };
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/routes/user-activity-portfolio", ["exports", "discourse/routes/user-topic-list", "discourse/models/user-action"], function (_exports, _userTopicList, _userAction) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var _default = _userTopicList.default.extend({
+    userActionType: _userAction.default.TYPES.topics,
+    model: function model() {
+      var filter_type = settings.topic_list_portfolio_filter_type;
+      var filter_parameter = settings.topic_list_portfolio_filter_parameter;
+
+      if (filter_type == 'tag') {
+        filter_type = 'tags';
+      }
+
+      return this.store.findFiltered("topicList", {
+        filter: "topics/created-by/" + this.modelFor("user").get("username_lower"),
+        params: _defineProperty({}, filter_type, filter_parameter)
+      });
+    }
+  });
+
+  _exports.default = _default;
+});
+}
+
+if ('define' in window) {
+define("discourse/theme-12/services/topic-list-previews", ["exports", "@ember/service", "discourse-common/utils/decorators", "discourse/models/site"], function (_exports, _service, _decorators, _site) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _obj;
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(12);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.12.".concat(key);
+  };
+
+  var thumbnailsTopicLists = settings.topic_list_thumbnails_topic_lists.split("|");
+  var tilesTopicLists = settings.topic_list_tiles_topic_lists.split("|");
+  var excerptsTopicLists = settings.topic_list_excerpts_topic_lists.split("|");
+  var actionsTopicLists = settings.topic_list_actions_topic_lists.split("|");
+  var thumbnailCategories = settings.topic_list_thumbnails_categories.split("|").map(function (id) {
+    return parseInt(id, 10);
+  });
+  var tilesCategories = settings.topic_list_tiles_categories.split("|").map(function (id) {
+    return parseInt(id, 10);
+  });
+  var excerptCategories = settings.topic_list_excerpts_categories.split("|").map(function (id) {
+    return parseInt(id, 10);
+  });
+  var actionCategories = settings.topic_list_actions_categories.split("|").map(function (id) {
+    return parseInt(id, 10);
+  });
+  var thumbnailTags = settings.topic_list_thumbnails_tags.split("|");
+  var excerptTags = settings.topic_list_excerpts_tags.split("|");
+  var tilesTags = settings.topic_list_tiles_tags.split("|");
+  var actionTags = settings.topic_list_actions_tags.split("|");
+
+  var _default = _service.default.extend((_dec = (0, _decorators.default)("router.currentRouteName"), _dec2 = (0, _decorators.default)("router.currentRouteName", "router.currentRoute.attributes.category.id"), _dec3 = (0, _decorators.default)("router.currentRouteName", "router.currentRoute.attributes.id"), _dec4 = (0, _decorators.default)("viewingCategoryId", "viewingTagId", "router.currentRoute.metadata.customThumbnailMode", "currentTopicListRoute"), _dec5 = (0, _decorators.default)("displayMode"), _dec6 = (0, _decorators.default)("enabledForRoute", "displayMode"), _dec7 = (0, _decorators.default)("enabledForRoute", "displayMode"), _dec8 = (0, _decorators.default)("enabledForRoute", "displayMode"), _dec9 = (0, _decorators.default)("enabledForRoute", "displayMode"), (_obj = {
+    router: (0, _service.inject)("router"),
+    enabledForCurrentTopicListRouteType: function enabledForCurrentTopicListRouteType(currentTopicListRoute, infoType) {
+      var checkList = [];
+
+      switch (infoType) {
+        case "thumbnails":
+          checkList = thumbnailsTopicLists;
+          break;
+
+        case "tiles":
+          checkList = tilesTopicLists;
+          break;
+
+        case "excerpts":
+          checkList = excerptsTopicLists;
+          break;
+
+        case "actions":
+          checkList = actionsTopicLists;
+      }
+
+      if (currentTopicListRoute == 'userActivity.portfolio') currentTopicListRoute = 'activity-portfolio';
+      if (currentTopicListRoute == 'userActivity.topics') currentTopicListRoute = 'activity-topics';
+      if (currentTopicListRoute.indexOf("topic") > -1) currentTopicListRoute = 'suggested';
+
+      var onMobile = _site.default.current().mobileView;
+
+      var found_item = checkList.find(function (item) {
+        var mobileSetting = false;
+        var itemShortRouteName = item;
+
+        if (item.indexOf("-mobile") > -1) {
+          mobileSetting = true;
+          itemShortRouteName = item.substring(0, item.indexOf("-mobile"));
+        }
+
+        if (settings.topic_list_set_category_defaults) {
+          if (currentTopicListRoute.indexOf("Category") > -1) {
+            currentTopicListRoute = item.substring(0, item.indexOf("Category"));
+          } else {
+            if (currentTopicListRoute == 'discovery.category') {
+              currentTopicListRoute = 'discovery.latest';
+            }
+          }
+        }
+
+        if (currentTopicListRoute.indexOf(itemShortRouteName) > -1 && (onMobile && mobileSetting || !onMobile && !mobileSetting)) {
+          return true;
+        }
+
+        return false;
+      });
+      return found_item && found_item.length > 0;
+    },
+    currentTopicListRoute: function currentTopicListRoute(currentRouteName) {
+      return currentRouteName;
+    },
+    viewingCategoryId: function viewingCategoryId(currentRouteName, categoryId) {
+      if (!currentRouteName.match(/^discovery\./)) return;
+      return categoryId;
+    },
+    viewingTagId: function viewingTagId(currentRouteName, tagId) {
+      if (!currentRouteName.match(/^tags?\.show/)) return;
+      return tagId;
+    },
+    displayMode: function displayMode(viewingCategoryId, viewingTagId, customThumbnailMode, currentTopicListRoute) {
+      var displayMode = [];
+      if (customThumbnailMode) displayMode.push(customThumbnailMode);
+
+      if (thumbnailCategories.includes(viewingCategoryId) || thumbnailTags.includes(viewingTagId) || this.enabledForCurrentTopicListRouteType(currentTopicListRoute, "thumbnails")) {
+        displayMode.push("thumbnails");
+      }
+
+      if (tilesCategories.includes(viewingCategoryId) || tilesTags.includes(viewingTagId) || this.enabledForCurrentTopicListRouteType(currentTopicListRoute, "tiles")) {
+        displayMode.push("tiles");
+      }
+
+      if (excerptCategories.includes(viewingCategoryId) || excerptTags.includes(viewingTagId) || this.enabledForCurrentTopicListRouteType(currentTopicListRoute, "excerpts")) {
+        displayMode.push("excerpts");
+      }
+
+      if (actionCategories.includes(viewingCategoryId) || actionTags.includes(viewingTagId) || this.enabledForCurrentTopicListRouteType(currentTopicListRoute, "actions")) {
+        displayMode.push("actions");
+      }
+
+      return displayMode;
+    },
+    enabledForRoute: function enabledForRoute(displayMode) {
+      return displayMode !== [];
+    },
+    displayThumbnails: function displayThumbnails(enabledForRoute, displayMode) {
+      return enabledForRoute && displayMode.includes("thumbnails");
+    },
+    displayTiles: function displayTiles(enabledForRoute, displayMode) {
+      return enabledForRoute && displayMode.includes("tiles");
+    },
+    displayExcerpts: function displayExcerpts(enabledForRoute, displayMode) {
+      return enabledForRoute && displayMode.includes("excerpts");
+    },
+    displayActions: function displayActions(enabledForRoute, displayMode) {
+      return enabledForRoute && displayMode.includes("actions");
+    }
+  }, (_applyDecoratedDescriptor(_obj, "currentTopicListRoute", [_dec], Object.getOwnPropertyDescriptor(_obj, "currentTopicListRoute"), _obj), _applyDecoratedDescriptor(_obj, "viewingCategoryId", [_dec2], Object.getOwnPropertyDescriptor(_obj, "viewingCategoryId"), _obj), _applyDecoratedDescriptor(_obj, "viewingTagId", [_dec3], Object.getOwnPropertyDescriptor(_obj, "viewingTagId"), _obj), _applyDecoratedDescriptor(_obj, "displayMode", [_dec4], Object.getOwnPropertyDescriptor(_obj, "displayMode"), _obj), _applyDecoratedDescriptor(_obj, "enabledForRoute", [_dec5], Object.getOwnPropertyDescriptor(_obj, "enabledForRoute"), _obj), _applyDecoratedDescriptor(_obj, "displayThumbnails", [_dec6], Object.getOwnPropertyDescriptor(_obj, "displayThumbnails"), _obj), _applyDecoratedDescriptor(_obj, "displayTiles", [_dec7], Object.getOwnPropertyDescriptor(_obj, "displayTiles"), _obj), _applyDecoratedDescriptor(_obj, "displayExcerpts", [_dec8], Object.getOwnPropertyDescriptor(_obj, "displayExcerpts"), _obj), _applyDecoratedDescriptor(_obj, "displayActions", [_dec9], Object.getOwnPropertyDescriptor(_obj, "displayActions"), _obj)), _obj)));
+
+  _exports.default = _default;
+});
+}
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/components/select-thumbnail"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[1,[28,\"d-button\",null,[[\"id\",\"class\",\"action\",\"icon\",\"label\"],[\"select-thumbnail-button\",\"btn-default select-thumbnail\",[28,\"action\",[[23,0,[]],\"showThumbnailSelector\"],null],\"id-card\",[28,\"theme-prefix\",[12,\"thumbnail_selector.select_preview_button\"],null]]]],false],[0,\"\\n\"],[4,\"if\",[[24,[\"showSelected\"]]],null,{\"statements\":[[0,\"    \"],[7,\"br\",true],[8],[9],[7,\"img\",true],[11,\"src\",[24,[\"buffered\",\"user_chosen_thumbnail_url\"]]],[10,\"class\",\"select-thumbnail-preview\"],[8],[9],[0,\"\\n\"]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/components/tlp-featured-topic"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[7,\"div\",true],[10,\"class\",\"featured-details\"],[8],[0,\"\\n  \"],[1,[28,\"preview-unbound\",[[24,[\"topic\",\"thumbnails\"]]],[[\"currentUser\",\"opts\"],[[24,[\"currentUser\"]],[28,\"hash\",null,[[\"featured\"],[true]]]]]],false],[0,\"\\n  \"],[7,\"div\",true],[10,\"class\",\"content\"],[8],[0,\"\\n    \"],[7,\"div\",true],[10,\"class\",\"title\"],[8],[0,\"\\n      \"],[1,[24,[\"topic\",\"title\"]],false],[0,\"\\n    \"],[9],[0,\"\\n\"],[4,\"if\",[[24,[\"featuredExcerpt\"]]],null,{\"statements\":[[0,\"      \"],[7,\"div\",true],[10,\"class\",\"excerpt\"],[8],[0,\"\\n        \"],[1,[22,\"featuredExcerpt\"],true],[0,\"\\n      \"],[9],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[7,\"span\",true],[10,\"class\",\"user\"],[8],[0,\"\\n      \"],[1,[22,\"featuredUsername\"],false],[0,\"\\n      \"],[1,[28,\"avatar\",[[24,[\"featuredUser\"]]],[[\"imageSize\"],[\"small\"]]],false],[0,\"\\n    \"],[9],[0,\"\\n  \"],[9],[0,\"\\n\"],[9],[0,\"\\n\"]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/components/tlp-featured-topics"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[\"tag\",\"t\"],\"statements\":[[4,\"if\",[[24,[\"hasTopics\"]]],null,{\"statements\":[[4,\"if\",[[24,[\"showFeaturedTitle\"]]],null,{\"statements\":[[0,\"    \"],[7,\"div\",true],[10,\"class\",\"featured-title\"],[8],[0,\"\\n      \"],[1,[22,\"featuredTitle\"],false],[0,\"\\n    \"],[9],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[7,\"div\",true],[10,\"class\",\"topics\"],[8],[0,\"\\n\"],[4,\"each\",[[24,[\"featuredTopics\"]]],null,{\"statements\":[[0,\"      \"],[1,[28,\"tlp-featured-topic\",null,[[\"topic\"],[[23,2,[]]]]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"  \"],[9],[0,\"\\n\"],[4,\"if\",[[24,[\"showFeaturedTags\"]]],null,{\"statements\":[[0,\"    \"],[7,\"div\",true],[10,\"class\",\"featured-tags\"],[8],[0,\"\\n\"],[4,\"each\",[[24,[\"featuredTags\"]]],null,{\"statements\":[[0,\"        \"],[1,[28,\"discourse-tag\",[[23,1,[]]],null],false],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"    \"],[9],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/components/tlp-user-preferences"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[],\"statements\":[[7,\"label\",true],[10,\"class\",\"control-label\"],[8],[1,[28,\"i18n\",[\"tlp.user_prefs.title\"],null],false],[9],[0,\"\\n\"],[1,[28,\"preference-checkbox\",null,[[\"labelKey\",\"checked\"],[\"tlp.user_prefs.prefer_low_res_thumbnail\",[24,[\"model\",\"custom_fields\",\"tlp_user_prefs_prefer_low_res_thumbnails\"]]]]],false]],\"hasEval\":false}","meta":{}});
+  }
+})();
+
+(function() {
+  const addRawTemplate = requirejs('discourse-common/lib/raw-templates').addRawTemplate;
+  const template = requirejs('discourse-common/lib/raw-handlebars').template({"1":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "    "
+    + container.escapeExpression((lookupProperty(helpers,"list-button")||(depth0 && lookupProperty(depth0,"list-button"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"action",{"name":"list-button","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":3,"column":4},"end":{"line":3,"column":26}}}))
+    + "\n";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "<div class=\"topic-actions\">\n"
+    + ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),"action","in","topicActions",{"name":"each","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(1, data, 0),"inverse":container.noop,"types":["PathExpression","CommentStatement","PathExpression"],"contexts":[depth0,depth0,depth0],"data":data,"loc":{"start":{"line":2,"column":2},"end":{"line":4,"column":11}}})) != null ? stack1 : "")
+    + "</div>\n";
+},"useData":true});
+  addRawTemplate("list/topic-actions", template);
+})();
+
+(function() {
+  const addRawTemplate = requirejs('discourse-common/lib/raw-templates').addRawTemplate;
+  const template = requirejs('discourse-common/lib/raw-handlebars').template({"1":function(container,depth0,helpers,partials,data) {
+    return "  <td class='star'>\n    <input type=\"checkbox\" class=\"bulk-select\">\n  </td>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "  <div class=\"tiles-grid-item-content\">\n    <div class=\"image\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"hasThumbnail",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(4, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":10,"column":6},"end":{"line":12,"column":13}}})) != null ? stack1 : "")
+    + "      <a href='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.url",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":13,"column":15},"end":{"line":13,"column":28}}}))
+    + "'>\n        <div class=\"image-mask\" style=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"backgroundGradient",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":14,"column":39},"end":{"line":14,"column":61}}}))
+    + "\"></div>\n      </a>\n    </div>\n    <div class=\"topic-details\">\n      <div class=\"topic-header-grid\">\n        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-list-title",{"name":"raw","hash":{"showTopicPostBadges":"showTopicPostBadges","tilesStyle":"tilesStyle","topic":"topic"},"hashTypes":{"showTopicPostBadges":"PathExpression","tilesStyle":"PathExpression","topic":"PathExpression"},"hashContexts":{"showTopicPostBadges":depth0,"tilesStyle":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":19,"column":8},"end":{"line":19,"column":113}}}))
+    + "\n        <div class=\"topic-category\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showCategoryBadge",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(6, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":21,"column":10},"end":{"line":23,"column":17}}})) != null ? stack1 : "")
+    + "        </div>\n      </div>\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showExcerpt",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(8, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":26,"column":6},"end":{"line":30,"column":13}}})) != null ? stack1 : "")
+    + "      "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-meta",{"name":"raw","hash":{"topic":"topic","title":"view.title","likesHeat":"likesHeat"},"hashTypes":{"topic":"PathExpression","title":"PathExpression","likesHeat":"PathExpression"},"hashContexts":{"topic":depth0,"title":depth0,"likesHeat":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":31,"column":6},"end":{"line":31,"column":80}}}))
+    + "\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showActions",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(10, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":32,"column":6},"end":{"line":34,"column":13}}})) != null ? stack1 : "")
+    + "    </div>\n  </div>\n";
+},"4":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-thumbnail",{"name":"raw","hash":{"opts":"thumbnailOpts","category":"category","site":"site","currentUser":"currentUser","thumbnails":"thumbnails","topic":"topic"},"hashTypes":{"opts":"PathExpression","category":"PathExpression","site":"PathExpression","currentUser":"PathExpression","thumbnails":"PathExpression","topic":"PathExpression"},"hashContexts":{"opts":depth0,"category":depth0,"site":depth0,"currentUser":depth0,"thumbnails":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":11,"column":8},"end":{"line":11,"column":143}}}))
+    + "\n";
+},"6":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "            "
+    + container.escapeExpression((lookupProperty(helpers,"category-link")||(depth0 && lookupProperty(depth0,"category-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.category",{"name":"category-link","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":22,"column":12},"end":{"line":22,"column":44}}}))
+    + "\n";
+},"8":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        <a href='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.url",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":27,"column":17},"end":{"line":27,"column":30}}}))
+    + "'>\n          "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-excerpt",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":28,"column":10},"end":{"line":28,"column":50}}}))
+    + "\n        </a>\n";
+},"10":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-actions",{"name":"raw","hash":{"topic":"topic","topicActions":"topicActions","likeCount":"likeCount"},"hashTypes":{"topic":"PathExpression","topicActions":"PathExpression","likeCount":"PathExpression"},"hashContexts":{"topic":depth0,"topicActions":depth0,"likeCount":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":33,"column":8},"end":{"line":33,"column":94}}}))
+    + "\n";
+},"12":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-columns"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":38,"column":2},"end":{"line":38,"column":57}}}))
+    + "\n  <td class='main-link clearfix topic-list-data' colspan=\"1\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"hasThumbnail",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(13, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":47,"column":4},"end":{"line":49,"column":11}}})) != null ? stack1 : "")
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-link"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":50,"column":4},"end":{"line":50,"column":56}}}))
+    + "\n    <span class='link-top-line'>"
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-status"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":52,"column":6},"end":{"line":52,"column":60}}}))
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic-status",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":53,"column":6},"end":{"line":53,"column":41}}}))
+    + container.escapeExpression((lookupProperty(helpers,"topic-link")||(depth0 && lookupProperty(depth0,"topic-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"topic-link","hash":{"class":"raw-link raw-topic-link"},"hashTypes":{"class":"StringLiteral"},"hashContexts":{"class":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":54,"column":6},"end":{"line":54,"column":59}}}))
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.featured_link",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(15, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":55,"column":6},"end":{"line":57,"column":14}}})) != null ? stack1 : "")
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-after-title"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":58,"column":6},"end":{"line":58,"column":58}}}))
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.unread-indicator",{"name":"raw","hash":{"unreadClass":"unreadClass","topicId":"topic.id","includeUnreadIndicator":"includeUnreadIndicator"},"hashTypes":{"unreadClass":"PathExpression","topicId":"PathExpression","includeUnreadIndicator":"PathExpression"},"hashContexts":{"unreadClass":depth0,"topicId":depth0,"includeUnreadIndicator":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":59,"column":6},"end":{"line":61,"column":62}}}))
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showTopicPostBadges",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(17, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":62,"column":6},"end":{"line":64,"column":14}}})) != null ? stack1 : "")
+    + "    </span>\n    <div class=\"link-bottom-line\">\n"
+    + ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),"hideCategory",{"name":"unless","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(19, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":67,"column":6},"end":{"line":72,"column":17}}})) != null ? stack1 : "")
+    + "      "
+    + container.escapeExpression((lookupProperty(helpers,"discourse-tags")||(depth0 && lookupProperty(depth0,"discourse-tags"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"discourse-tags","hash":{"tagsForUser":"tagsForUser","mode":"list"},"hashTypes":{"tagsForUser":"PathExpression","mode":"StringLiteral"},"hashContexts":{"tagsForUser":depth0,"mode":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":73,"column":6},"end":{"line":73,"column":66}}}))
+    + "\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"expandPinned",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(22, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":74,"column":6},"end":{"line":76,"column":13}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showActions",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(24, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":77,"column":6},"end":{"line":79,"column":13}}})) != null ? stack1 : "")
+    + "      "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.action-list",{"name":"raw","hash":{"icon":"heart","className":"likes","postNumbers":"topic.liked_post_numbers","topic":"topic"},"hashTypes":{"icon":"StringLiteral","className":"StringLiteral","postNumbers":"PathExpression","topic":"PathExpression"},"hashContexts":{"icon":depth0,"className":depth0,"postNumbers":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":80,"column":6},"end":{"line":80,"column":112}}}))
+    + "\n    </div>\n  </td>\n\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showPosters",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(26, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":84,"column":2},"end":{"line":86,"column":9}}})) != null ? stack1 : "")
+    + "\n  "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.posts-count-column",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":88,"column":2},"end":{"line":88,"column":47}}}))
+    + "\n\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showLikes",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(28, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":90,"column":2},"end":{"line":98,"column":9}}})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showOpLikes",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(31, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":100,"column":2},"end":{"line":108,"column":9}}})) != null ? stack1 : "")
+    + "\n  <td class=\"num views "
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.viewsHeat",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":110,"column":23},"end":{"line":110,"column":42}}}))
+    + " topic-list-data\">\n    "
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-view-count"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":111,"column":4},"end":{"line":111,"column":61}}}))
+    + "\n    "
+    + container.escapeExpression((lookupProperty(helpers,"number")||(depth0 && lookupProperty(depth0,"number"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.views",{"name":"number","hash":{"numberKey":"views_long"},"hashTypes":{"numberKey":"StringLiteral"},"hashContexts":{"numberKey":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":112,"column":4},"end":{"line":112,"column":49}}}))
+    + "\n  </td>\n\n  "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.activity-column",{"name":"raw","hash":{"tagName":"td","class":"num topic-list-data","topic":"topic"},"hashTypes":{"tagName":"StringLiteral","class":"StringLiteral","topic":"PathExpression"},"hashContexts":{"tagName":depth0,"class":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":115,"column":2},"end":{"line":115,"column":85}}}))
+    + "\n";
+},"13":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "      "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-thumbnail",{"name":"raw","hash":{"opts":"thumbnailOpts","category":"category","thumbnails":"thumbnails","topic":"topic"},"hashTypes":{"opts":"PathExpression","category":"PathExpression","thumbnails":"PathExpression","topic":"PathExpression"},"hashContexts":{"opts":depth0,"category":depth0,"thumbnails":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":48,"column":6},"end":{"line":48,"column":107}}}))
+    + "\n";
+},"15":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"topic-featured-link")||(depth0 && lookupProperty(depth0,"topic-featured-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"topic-featured-link","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":56,"column":8},"end":{"line":56,"column":38}}}));
+},"17":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic-post-badges",{"name":"raw","hash":{"newDotText":"newDotText","url":"topic.lastUnreadUrl","unseen":"topic.unseen","unreadPosts":"topic.unread_posts"},"hashTypes":{"newDotText":"PathExpression","url":"PathExpression","unseen":"PathExpression","unreadPosts":"PathExpression"},"hashContexts":{"newDotText":depth0,"url":depth0,"unseen":depth0,"unreadPosts":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":63,"column":8},"end":{"line":63,"column":133}}}));
+},"19":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.isPinnedUncategorized",{"name":"unless","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(20, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":68,"column":8},"end":{"line":71,"column":19}}})) != null ? stack1 : "");
+},"20":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-category"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":69,"column":10},"end":{"line":69,"column":66}}}))
+    + "\n          "
+    + container.escapeExpression((lookupProperty(helpers,"category-link")||(depth0 && lookupProperty(depth0,"category-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.category",{"name":"category-link","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":70,"column":10},"end":{"line":70,"column":42}}}))
+    + "\n";
+},"22":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-excerpt",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":75,"column":8},"end":{"line":75,"column":48}}}))
+    + "\n";
+},"24":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-actions",{"name":"raw","hash":{"topicActions":"topicActions","likeCount":"likeCount"},"hashTypes":{"topicActions":"PathExpression","likeCount":"PathExpression"},"hashContexts":{"topicActions":depth0,"likeCount":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":78,"column":8},"end":{"line":78,"column":82}}}))
+    + "\n";
+},"26":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "    "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.posters-column",{"name":"raw","hash":{"posters":"topic.featuredUsers"},"hashTypes":{"posters":"PathExpression"},"hashContexts":{"posters":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":85,"column":4},"end":{"line":85,"column":61}}}))
+    + "\n";
+},"28":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "    <td class=\"num likes topic-list-data\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"hasLikes",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(29, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":92,"column":6},"end":{"line":96,"column":13}}})) != null ? stack1 : "")
+    + "    </td>\n";
+},"29":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        <a href='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.summaryUrl",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":93,"column":17},"end":{"line":93,"column":37}}}))
+    + "'>\n          "
+    + container.escapeExpression((lookupProperty(helpers,"number")||(depth0 && lookupProperty(depth0,"number"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.like_count",{"name":"number","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":94,"column":10},"end":{"line":94,"column":37}}}))
+    + " "
+    + container.escapeExpression((lookupProperty(helpers,"d-icon")||(depth0 && lookupProperty(depth0,"d-icon"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"heart",{"name":"d-icon","hash":{},"hashTypes":{},"hashContexts":{},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":94,"column":38},"end":{"line":94,"column":56}}}))
+    + "\n        </a>\n";
+},"31":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "    <td class=\"num likes\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"hasOpLikes",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(32, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":102,"column":6},"end":{"line":106,"column":13}}})) != null ? stack1 : "")
+    + "    </td>\n";
+},"32":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        <a href='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.summaryUrl",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":103,"column":17},"end":{"line":103,"column":37}}}))
+    + "'>\n          "
+    + container.escapeExpression((lookupProperty(helpers,"number")||(depth0 && lookupProperty(depth0,"number"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.op_like_count",{"name":"number","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":104,"column":10},"end":{"line":104,"column":40}}}))
+    + " "
+    + container.escapeExpression((lookupProperty(helpers,"d-icon")||(depth0 && lookupProperty(depth0,"d-icon"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"heart",{"name":"d-icon","hash":{},"hashTypes":{},"hashContexts":{},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":104,"column":41},"end":{"line":104,"column":59}}}))
+    + "\n        </a>\n";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"bulkSelectEnabled",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(1, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":1,"column":0},"end":{"line":5,"column":7}}})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"tilesStyle",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(3, data, 0),"inverse":container.program(12, data, 0),"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":7,"column":0},"end":{"line":116,"column":7}}})) != null ? stack1 : "");
+},"useData":true});
+  addRawTemplate("list/topic-list-item", template);
+})();
+
+(function() {
+  const addRawTemplate = requirejs('discourse-common/lib/raw-templates').addRawTemplate;
+  const template = requirejs('discourse-common/lib/raw-handlebars').template({"1":function(container,depth0,helpers,partials,data) {
+    return "  <div class=\"topic-title\">\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"mobileView",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(4, data, 0),"inverse":container.program(7, data, 0),"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":9,"column":6},"end":{"line":20,"column":13}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.featured_link",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(10, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":21,"column":6},"end":{"line":23,"column":13}}})) != null ? stack1 : "");
+},"4":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.unseen",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(5, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":10,"column":8},"end":{"line":12,"column":15}}})) != null ? stack1 : "");
+},"5":function(container,depth0,helpers,partials,data) {
+    return "          <span class=\"badge-notification new-topic\"></span>\n";
+},"7":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.unread-indicator",{"name":"raw","hash":{"unreadClass":"unreadClass","topicId":"topic.id","includeUnreadIndicator":"includeUnreadIndicator"},"hashTypes":{"unreadClass":"PathExpression","topicId":"PathExpression","includeUnreadIndicator":"PathExpression"},"hashContexts":{"unreadClass":depth0,"topicId":depth0,"includeUnreadIndicator":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":14,"column":8},"end":{"line":16,"column":58}}}))
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showTopicPostBadges",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(8, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":17,"column":8},"end":{"line":19,"column":15}}})) != null ? stack1 : "");
+},"8":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic-post-badges",{"name":"raw","hash":{"newDotText":"newDotText","url":"topic.lastUnreadUrl","unseen":"topic.unseen","unreadPosts":"topic.unread_posts"},"hashTypes":{"newDotText":"PathExpression","url":"PathExpression","unseen":"PathExpression","unreadPosts":"PathExpression"},"hashContexts":{"newDotText":depth0,"url":depth0,"unseen":depth0,"unreadPosts":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":18,"column":10},"end":{"line":18,"column":135}}}))
+    + "\n";
+},"10":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        "
+    + container.escapeExpression((lookupProperty(helpers,"topic-featured-link")||(depth0 && lookupProperty(depth0,"topic-featured-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"topic-featured-link","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":22,"column":8},"end":{"line":22,"column":37}}}))
+    + "\n";
+},"12":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.featured_link",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(10, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":25,"column":6},"end":{"line":27,"column":13}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"mobileView",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(4, data, 0),"inverse":container.program(7, data, 0),"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":28,"column":6},"end":{"line":39,"column":13}}})) != null ? stack1 : "");
+},"14":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "  </div>\n  "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-users",{"name":"raw","hash":{"posterNames":"posterNames","topic":"topic","tilesStyle":"tilesStyle"},"hashTypes":{"posterNames":"PathExpression","topic":"PathExpression","tilesStyle":"PathExpression"},"hashContexts":{"posterNames":depth0,"topic":depth0,"tilesStyle":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":46,"column":2},"end":{"line":46,"column":86}}}))
+    + "\n";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"tilesStyle",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(1, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":1,"column":0},"end":{"line":3,"column":7}}})) != null ? stack1 : "")
+    + "  <span class='link-top-line'>"
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-status"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":5,"column":4},"end":{"line":5,"column":58}}}))
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic-status",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":6,"column":4},"end":{"line":6,"column":39}}}))
+    + container.escapeExpression((lookupProperty(helpers,"topic-link")||(depth0 && lookupProperty(depth0,"topic-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"topic-link","hash":{"class":"raw-link raw-topic-link"},"hashTypes":{"class":"StringLiteral"},"hashContexts":{"class":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":7,"column":4},"end":{"line":7,"column":57}}}))
+    + "\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"tilesStyle",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(3, data, 0),"inverse":container.program(12, data, 0),"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":8,"column":4},"end":{"line":40,"column":11}}})) != null ? stack1 : "")
+    + "\n    "
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-after-title"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":42,"column":4},"end":{"line":42,"column":55}}}))
+    + "\n  </span>\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"tilesStyle",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(14, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":44,"column":0},"end":{"line":47,"column":7}}})) != null ? stack1 : "");
+},"useData":true});
+  addRawTemplate("list/topic-list-title", template);
+})();
+
+(function() {
+  const addRawTemplate = requirejs('discourse-common/lib/raw-templates').addRawTemplate;
+  const template = requirejs('discourse-common/lib/raw-handlebars').template({"1":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "  <div class=\"topic-tags\">\n    "
+    + container.escapeExpression((lookupProperty(helpers,"discourse-tags")||(depth0 && lookupProperty(depth0,"discourse-tags"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"discourse-tags","hash":{"mode":"list"},"hashTypes":{"mode":"StringLiteral"},"hashContexts":{"mode":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":3,"column":4},"end":{"line":3,"column":40}}}))
+    + "\n  </div>\n";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.tags",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(1, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":1,"column":0},"end":{"line":5,"column":7}}})) != null ? stack1 : "")
+    + "<div class=\"topic-meta\">\n  "
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-tiles-meta"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":7,"column":2},"end":{"line":7,"column":52}}}))
+    + "\n  <div class=\"topic-views "
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.viewsHeat",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":8,"column":26},"end":{"line":8,"column":45}}}))
+    + " inline sub\">\n    "
+    + container.escapeExpression((lookupProperty(helpers,"d-icon")||(depth0 && lookupProperty(depth0,"d-icon"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"far-eye",{"name":"d-icon","hash":{},"hashTypes":{},"hashContexts":{},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":9,"column":4},"end":{"line":9,"column":24}}}))
+    + "\n    "
+    + container.escapeExpression((lookupProperty(helpers,"number")||(depth0 && lookupProperty(depth0,"number"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.views",{"name":"number","hash":{"numberKey":"views_long"},"hashTypes":{"numberKey":"StringLiteral"},"hashContexts":{"numberKey":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":10,"column":4},"end":{"line":10,"column":49}}}))
+    + "\n  </div>\n  <span class=\"middot inline sub\"></span>\n  <div class='topic-replies posts-map "
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"likesHeat",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":13,"column":38},"end":{"line":13,"column":51}}}))
+    + " inline sub' title='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"title",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":13,"column":71},"end":{"line":13,"column":80}}}))
+    + "'>\n    <a href class='posts-map badge-posts "
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"likesHeat",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":14,"column":41},"end":{"line":14,"column":54}}}))
+    + "'>"
+    + container.escapeExpression((lookupProperty(helpers,"d-icon")||(depth0 && lookupProperty(depth0,"d-icon"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"far-comment",{"name":"d-icon","hash":{},"hashTypes":{},"hashContexts":{},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":14,"column":56},"end":{"line":14,"column":80}}}))
+    + container.escapeExpression((lookupProperty(helpers,"number")||(depth0 && lookupProperty(depth0,"number"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.replyCount",{"name":"number","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":14,"column":80},"end":{"line":14,"column":107}}}))
+    + "</a>\n  </div>\n  <span class=\"middot inline sub\"></span>\n  <div class=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"class",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":17,"column":14},"end":{"line":17,"column":23}}}))
+    + " "
+    + container.escapeExpression((lookupProperty(helpers,"cold-age-class")||(depth0 && lookupProperty(depth0,"cold-age-class"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.createdAt",{"name":"cold-age-class","hash":{"class":"","startDate":"topic.bumpedAt"},"hashTypes":{"class":"StringLiteral","startDate":"PathExpression"},"hashContexts":{"class":depth0,"startDate":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":17,"column":24},"end":{"line":17,"column":92}}}))
+    + " activity inline sub\" title=\""
+    + ((stack1 = lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.bumpedAtTitle",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":17,"column":121},"end":{"line":17,"column":146}}})) != null ? stack1 : "")
+    + "\">\n    <a href=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.lastPostUrl",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":18,"column":13},"end":{"line":18,"column":34}}}))
+    + "\">"
+    + container.escapeExpression((lookupProperty(helpers,"format-date")||(depth0 && lookupProperty(depth0,"format-date"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.bumpedAt",{"name":"format-date","hash":{"noTitle":"true","format":"medium-with-ago"},"hashTypes":{"noTitle":"StringLiteral","format":"StringLiteral"},"hashContexts":{"noTitle":depth0,"format":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":18,"column":36},"end":{"line":18,"column":106}}}))
+    + "</a>\n  </div>\n</div>\n";
+},"useData":true});
+  addRawTemplate("list/topic-meta", template);
+})();
+
+(function() {
+  const addRawTemplate = requirejs('discourse-common/lib/raw-templates').addRawTemplate;
+  const template = requirejs('discourse-common/lib/raw-handlebars').template({"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "<div class=\"topic-thumbnail\">\n  <a href='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.url",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":2,"column":11},"end":{"line":2,"column":24}}}))
+    + "'>\n    "
+    + container.escapeExpression((lookupProperty(helpers,"preview-unbound")||(depth0 && lookupProperty(depth0,"preview-unbound"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"thumbnails",{"name":"preview-unbound","hash":{"opts":"opts","category":"category","site":"site","currentUser":"currentUser"},"hashTypes":{"opts":"PathExpression","category":"PathExpression","site":"PathExpression","currentUser":"PathExpression"},"hashContexts":{"opts":depth0,"category":depth0,"site":depth0,"currentUser":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":3,"column":4},"end":{"line":3,"column":96}}}))
+    + "\n  </a>\n</div>\n";
+},"useData":true});
+  addRawTemplate("list/topic-thumbnail", template);
+})();
+
+(function() {
+  const addRawTemplate = requirejs('discourse-common/lib/raw-templates').addRawTemplate;
+  const template = requirejs('discourse-common/lib/raw-handlebars').template({"1":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "      <a href=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"poster.user.path",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":4,"column":15},"end":{"line":4,"column":35}}}))
+    + "\" data-user-card=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"poster.user.username",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":4,"column":53},"end":{"line":4,"column":77}}}))
+    + "\" class=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"poster.extras",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":4,"column":86},"end":{"line":4,"column":103}}}))
+    + "\">\n        "
+    + container.escapeExpression((lookupProperty(helpers,"avatar")||(depth0 && lookupProperty(depth0,"avatar"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"poster",{"name":"avatar","hash":{"imageSize":"small","usernamePath":"user.username","avatarTemplatePath":"user.avatar_template"},"hashTypes":{"imageSize":"StringLiteral","usernamePath":"StringLiteral","avatarTemplatePath":"StringLiteral"},"hashContexts":{"imageSize":depth0,"usernamePath":depth0,"avatarTemplatePath":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":5,"column":8},"end":{"line":5,"column":114}}}))
+    + "\n      </a>\n";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "<div class='topic-users'>\n  <div class=\"inline\">\n"
+    + ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),"poster","in","topic.posters",{"name":"each","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(1, data, 0),"inverse":container.noop,"types":["PathExpression","CommentStatement","PathExpression"],"contexts":[depth0,depth0,depth0],"data":data,"loc":{"start":{"line":3,"column":4},"end":{"line":7,"column":13}}})) != null ? stack1 : "")
+    + "  </div>\n</div>\n";
+},"useData":true});
+  addRawTemplate("list/topic-users", template);
+})();
+
+(function() {
+  const addRawTemplate = requirejs('discourse-common/lib/raw-templates').addRawTemplate;
+  const template = requirejs('discourse-common/lib/raw-handlebars').template({"1":function(container,depth0,helpers,partials,data) {
+    return "  <td class='star'>\n    <input type=\"checkbox\" class=\"bulk-select\">\n  </td>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "  <div class=\"tiles-grid-item-content\">\n    <div class=\"image\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"hasThumbnail",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(4, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":10,"column":6},"end":{"line":12,"column":13}}})) != null ? stack1 : "")
+    + "      <a href='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.url",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":13,"column":15},"end":{"line":13,"column":28}}}))
+    + "'>\n        <div class=\"image-mask\" style=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"backgroundGradient",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":14,"column":39},"end":{"line":14,"column":61}}}))
+    + "\"></div>\n      </a>\n    </div>\n    <div class=\"topic-details\">\n      <div class=\"topic-header-grid\">\n        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-list-title",{"name":"raw","hash":{"showTopicPostBadges":"showTopicPostBadges","tilesStyle":"tilesStyle","topic":"topic"},"hashTypes":{"showTopicPostBadges":"PathExpression","tilesStyle":"PathExpression","topic":"PathExpression"},"hashContexts":{"showTopicPostBadges":depth0,"tilesStyle":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":19,"column":8},"end":{"line":19,"column":113}}}))
+    + "\n        <div class=\"topic-category\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showCategoryBadge",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(6, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":21,"column":10},"end":{"line":23,"column":17}}})) != null ? stack1 : "")
+    + "        </div>\n      </div>\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showExcerpt",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(8, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":26,"column":6},"end":{"line":30,"column":13}}})) != null ? stack1 : "")
+    + "      "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-meta",{"name":"raw","hash":{"topic":"topic","title":"view.title","likesHeat":"likesHeat"},"hashTypes":{"topic":"PathExpression","title":"PathExpression","likesHeat":"PathExpression"},"hashContexts":{"topic":depth0,"title":depth0,"likesHeat":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":31,"column":6},"end":{"line":31,"column":80}}}))
+    + "\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showActions",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(10, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":32,"column":6},"end":{"line":34,"column":13}}})) != null ? stack1 : "")
+    + "    </div>\n  </div>\n";
+},"4":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-thumbnail",{"name":"raw","hash":{"opts":"thumbnailOpts","category":"category","thumbnails":"thumbnails","topic":"topic"},"hashTypes":{"opts":"PathExpression","category":"PathExpression","thumbnails":"PathExpression","topic":"PathExpression"},"hashContexts":{"opts":depth0,"category":depth0,"thumbnails":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":11,"column":8},"end":{"line":11,"column":109}}}))
+    + "\n";
+},"6":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "            "
+    + container.escapeExpression((lookupProperty(helpers,"category-link")||(depth0 && lookupProperty(depth0,"category-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.category",{"name":"category-link","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":22,"column":12},"end":{"line":22,"column":44}}}))
+    + "\n";
+},"8":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        <a href='"
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.url",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":27,"column":17},"end":{"line":27,"column":30}}}))
+    + "'>\n          "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-excerpt",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":28,"column":10},"end":{"line":28,"column":50}}}))
+    + "\n        </a>\n";
+},"10":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-actions",{"name":"raw","hash":{"topic":"topic","topicActions":"topicActions","likeCount":"likeCount"},"hashTypes":{"topic":"PathExpression","topicActions":"PathExpression","likeCount":"PathExpression"},"hashContexts":{"topic":depth0,"topicActions":depth0,"likeCount":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":33,"column":8},"end":{"line":33,"column":94}}}))
+    + "\n";
+},"12":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "  <td class=\"topic-list-data\">"
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-columns"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":39,"column":4},"end":{"line":39,"column":59}}}))
+    + "\n    <div class='pull-left'>\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"hasThumbnail",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(4, data, 0),"inverse":container.program(13, data, 0),"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":41,"column":6},"end":{"line":45,"column":13}}})) != null ? stack1 : "")
+    + "    </div>\n    <div class='right'>\n"
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-link"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":55,"column":6},"end":{"line":55,"column":58}}}))
+    + "\n      <div class='main-link'>"
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-status"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":57,"column":8},"end":{"line":57,"column":62}}}))
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic-status",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":58,"column":8},"end":{"line":58,"column":44}}}))
+    + container.escapeExpression((lookupProperty(helpers,"topic-link")||(depth0 && lookupProperty(depth0,"topic-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"topic-link","hash":{"class":"raw-link raw-topic-link"},"hashTypes":{"class":"StringLiteral"},"hashContexts":{"class":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":59,"column":8},"end":{"line":59,"column":61}}}))
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.featured_link",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(15, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":60,"column":8},"end":{"line":62,"column":17}}})) != null ? stack1 : "")
+    + container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-after-title"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":63,"column":8},"end":{"line":63,"column":60}}}))
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.unseen",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(17, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":64,"column":8},"end":{"line":66,"column":17}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showExcerpt",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(19, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":67,"column":8},"end":{"line":69,"column":17}}})) != null ? stack1 : "")
+    + "</div>\n      <div class='pull-right'>\n        "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.post-count-or-badges",{"name":"raw","hash":{"postBadgesEnabled":"showTopicPostBadges","topic":"topic"},"hashTypes":{"postBadgesEnabled":"PathExpression","topic":"PathExpression"},"hashContexts":{"postBadgesEnabled":depth0,"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":72,"column":8},"end":{"line":72,"column":93}}}))
+    + "\n      </div>\n      <div class=\"topic-item-stats clearfix\">\n"
+    + ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),"hideCategory",{"name":"unless","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(21, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":75,"column":8},"end":{"line":80,"column":19}}})) != null ? stack1 : "")
+    + "        "
+    + container.escapeExpression((lookupProperty(helpers,"discourse-tags")||(depth0 && lookupProperty(depth0,"discourse-tags"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"discourse-tags","hash":{"mode":"list"},"hashTypes":{"mode":"StringLiteral"},"hashContexts":{"mode":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":81,"column":8},"end":{"line":81,"column":44}}}))
+    + "\n        <div class=\"pull-right\">\n          <div class=\"keep-in-line\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"showActions",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(23, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":84,"column":12},"end":{"line":86,"column":19}}})) != null ? stack1 : "")
+    + "            <div class='num activity last'>\n              <span class=\"age activity\" title=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.bumpedAtTitle",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":88,"column":48},"end":{"line":88,"column":71}}}))
+    + "\"><a\n                  href=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.lastPostUrl",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":89,"column":24},"end":{"line":89,"column":45}}}))
+    + "\">"
+    + container.escapeExpression((lookupProperty(helpers,"format-date")||(depth0 && lookupProperty(depth0,"format-date"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.bumpedAt",{"name":"format-date","hash":{"noTitle":"true","format":"tiny"},"hashTypes":{"noTitle":"StringLiteral","format":"StringLiteral"},"hashContexts":{"noTitle":depth0,"format":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":89,"column":47},"end":{"line":89,"column":106}}}))
+    + "</a>\n              </span>\n            </div>\n          </div>\n        </div>\n        <div class=\"clearfix\"></div>\n      </div>\n    </div>\n  </td>\n";
+},"13":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        <a href=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.lastPostUrl",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":44,"column":17},"end":{"line":44,"column":38}}}))
+    + "\" data-user-card=\""
+    + container.escapeExpression(lookupProperty(helpers,"get").call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.last_poster_username",{"name":"get","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":44,"column":56},"end":{"line":44,"column":86}}}))
+    + "\">"
+    + container.escapeExpression((lookupProperty(helpers,"avatar")||(depth0 && lookupProperty(depth0,"avatar"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.lastPosterUser",{"name":"avatar","hash":{"imageSize":"large"},"hashTypes":{"imageSize":"StringLiteral"},"hashContexts":{"imageSize":depth0},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":44,"column":88},"end":{"line":44,"column":137}}}))
+    + "</a>\n";
+},"15":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"topic-featured-link")||(depth0 && lookupProperty(depth0,"topic-featured-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic",{"name":"topic-featured-link","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":61,"column":8},"end":{"line":61,"column":39}}}));
+},"17":function(container,depth0,helpers,partials,data) {
+    return "<span class=\"topic-post-badges\">&nbsp;<span class=\"badge-notification new-topic\"></span></span>";
+},"19":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-excerpt",{"name":"raw","hash":{"topic":"topic"},"hashTypes":{"topic":"PathExpression"},"hashContexts":{"topic":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":68,"column":8},"end":{"line":68,"column":50}}}));
+},"21":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression((lookupProperty(helpers,"raw-plugin-outlet")||(depth0 && lookupProperty(depth0,"raw-plugin-outlet"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"raw-plugin-outlet","hash":{"name":"topic-list-before-category"},"hashTypes":{"name":"StringLiteral"},"hashContexts":{"name":depth0},"types":[],"contexts":[],"data":data,"loc":{"start":{"line":76,"column":10},"end":{"line":76,"column":66}}}))
+    + "\n          <div class='category'>\n            "
+    + container.escapeExpression((lookupProperty(helpers,"category-link")||(depth0 && lookupProperty(depth0,"category-link"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"topic.category",{"name":"category-link","hash":{},"hashTypes":{},"hashContexts":{},"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":78,"column":12},"end":{"line":78,"column":44}}}))
+    + "\n          </div>\n";
+},"23":function(container,depth0,helpers,partials,data) {
+    var lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "              "
+    + container.escapeExpression((lookupProperty(helpers,"raw")||(depth0 && lookupProperty(depth0,"raw"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"list.topic-actions",{"name":"raw","hash":{"topicActions":"topicActions","likeCount":"likeCount"},"hashTypes":{"topicActions":"PathExpression","likeCount":"PathExpression"},"hashContexts":{"topicActions":depth0,"likeCount":depth0},"types":["StringLiteral"],"contexts":[depth0],"data":data,"loc":{"start":{"line":85,"column":14},"end":{"line":85,"column":88}}}))
+    + "\n";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"bulkSelectEnabled",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(1, data, 0),"inverse":container.noop,"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":1,"column":0},"end":{"line":5,"column":7}}})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),"tilesStyle",{"name":"if","hash":{},"hashTypes":{},"hashContexts":{},"fn":container.program(3, data, 0),"inverse":container.program(12, data, 0),"types":["PathExpression"],"contexts":[depth0],"data":data,"loc":{"start":{"line":7,"column":0},"end":{"line":98,"column":7}}})) != null ? stack1 : "");
+},"useData":true});
+  addRawTemplate("mobile/list/topic-list-item", template);
+})();
+
+(function() {
+  if ('Ember' in window) {
+    Ember.TEMPLATES["javascripts/modal/tlp-thumbnail-selector"] = Ember.HTMLBars.template({"id":null,"block":"{\"symbols\":[\"thumbnail\"],\"statements\":[[4,\"d-modal-body\",null,[[\"class\",\"title\"],[\"select-thumbnail\",[28,\"theme-prefix\",[12,\"thumbnail_selector.title\"],null]]],{\"statements\":[[0,\"  \"],[7,\"h3\",true],[8],[1,[28,\"i18n\",[[28,\"theme-prefix\",[12,\"thumbnail_selector.topic_title_prefix\"],null]],null],false],[0,\" \\\"\"],[1,[22,\"modal_topic_title\"],false],[0,\"\\\"\"],[9],[0,\"\\n  \"],[7,\"span\",true],[10,\"class\",\"select-thumbnail\"],[8],[0,\"\\n\"],[4,\"each\",[[24,[\"thumbnailList\",\"thumbnailselection\"]]],null,{\"statements\":[[0,\"    \"],[7,\"img\",false],[12,\"class\",\"select-thumbnail-options\"],[12,\"src\",[23,1,[\"image_url\"]]],[3,\"action\",[[23,0,[]],\"selectThumbnail\",[23,1,[\"image_url\"]],[23,1,[\"upload_id\"]]]],[8],[9],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[9],[0,\"\\n\"]],\"parameters\":[]},null]],\"hasEval\":false}","meta":{}});
+  }
+})();
+

@@ -1,0 +1,38 @@
+if ('define' in window) {
+define("discourse/theme-12/pre-initializers/theme-12-translations", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+  var _default = {
+    name: "theme-12-translations",
+    initialize: function initialize() {
+      /* Translation data for theme 12 (en)*/
+      var data = {
+        "en": {
+          "user_activity_portfolio_title": "Portfolio",
+          "thumbnail_selector": {
+            "select_preview_button": "Select thumbnail",
+            "title": "Select the desired preview thumbnail",
+            "topic_title_prefix": "Topic:"
+          }
+        }
+      };
+
+      for (var lang in data) {
+        var cursor = I18n.translations;
+
+        for (var _i = 0, _arr = [lang, "js", "theme_translations"]; _i < _arr.length; _i++) {
+          var key = _arr[_i];
+          cursor = cursor[key] = cursor[key] || {};
+        }
+
+        cursor[12] = data[lang];
+      }
+    }
+  };
+  _exports.default = _default;
+});
+}
