@@ -1,21 +1,32 @@
 version: "3.1"
 
 intents:
-  - greet
-  - goodbye
-  - affirm
-  - deny
-  - mood_great
-  - mood_unhappy
+  - hours
+  - academics
+  - records
+  - food
+  - resolve_conflict
+  - chitchat
+  - trivia
+  - what_can_you_do
   - bot_challenge
   - weather
+  - events
+
 
 actions: 
   - action_get_weather
+  - utter_intro
+  - utter_goodbye
+  - utter_iamabot
+  - get_menu
   
 responses:
   utter_greet:
   - text: "Hey! How are you?"
+
+  action_get_weather:
+  - text: "Here is the weather: "
 
   utter_cheer_up:
   - text: "Here is something to cheer you up:"

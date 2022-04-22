@@ -7,6 +7,11 @@ rules:
   - intent: goodbye
   - action: utter_goodbye
 
+- rule: Say hello anytime the user says hello
+  steps: 
+  - intent: hello
+  - action: utter_intro 
+
 - rule: Say 'I am a bot' anytime the user challenges
   steps:
   - intent: bot_challenge
@@ -17,3 +22,8 @@ rules:
   steps:
   - intent: weather
   - action: action_get_weather
+
+- rule: Get the Bone menu
+  steps:
+  - intent: menu
+  -action: get_menu
