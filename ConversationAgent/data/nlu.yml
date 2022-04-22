@@ -1,73 +1,51 @@
 version: "3.1"
 
 nlu:
-- intent: greet
+- intent: hours
   examples: |
-    - hey
-    - hello
-    - hi
-    - hello there
-    - good morning
-    - good evening
-    - moin
-    - hey there
-    - let's go
-    - hey dude
-    - goodmorning
-    - goodevening
-    - good afternoon
+    - How late is the Union open today?
+    - When does the Union close tonight?
+    - What time does the bookstore open today?
+    - Bon hours Saturday
+    - When is the financial aid office open?
+    - Registrar's office hours
+    - Academic building hours
+    - BIC weekend hours
+    - KIC weekday hours
 
-- intent: goodbye
+- intent: academics
   examples: |
-    - cu
-    - good by
-    - cee you later
-    - good night
-    - bye
-    - goodbye
-    - have a nice day
-    - see you around
-    - bye bye
-    - see you later
+    - Requirements for ME major
+    - Math and CS double major
+    - Credit hours needed for Chem E major
+    - Calculus 3 offerings fall quarter 2023-4
+    - DE 1 sections next quarter
+    - Professors in the ECE department
 
-- intent: affirm
+- intent: records
   examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
+    - What is my current GPA?
+    - What was my GPA last quarter?
+    - How many courses have I failed?
+    - What courses did I take last quarter?
+    - How many credits do I have?
 
-- intent: deny
+- intent: food
   examples: |
-    - no
-    - n
-    - never
-    - I don't think so
-    - don't like that
-    - no way
-    - not really
+    - What is for breakfast at the Bon?
+    - What is for lunch at the Bon?
+    - What is for dinner at the Bon?
+    - Bon breakfast menu
+    - Bon lunch menu
+    - Bon dinner menu
+    - Bon weekday hours
+    - What times does lunch end at the Bon?
+    - Bon dinner hours
 
-- intent: mood_great
+- intent: resolve_conflict
   examples: |
-    - perfect
-    - great
-    - amazing
-    - feeling like a king
-    - wonderful
-    - I am feeling very good
-    - I am great
-    - I am amazing
-    - I am going to save the world
-    - super stoked
-    - extremely good
-    - so so perfect
-    - so good
-    - so perfect
-
-- intent: mood_unhappy
-  examples: |
+    - You are terrible!
+    - this is trash
     - my day was horrible
     - I am sad
     - I don't feel very well
@@ -82,6 +60,28 @@ nlu:
     - extremly sad
     - so saad
     - so sad
+    - Rose is terrible
+    - I am going to drop out
+    - going to drop out of rose
+
+- intent: chitchat
+  examples: |
+    - I am a Mechanical Engineer
+    - Who created you?
+    - Rose is great!
+
+- intent: trivia
+  examples: |
+    - When was Rose founded?
+    - What is Rose's acceptance rate?
+    - How many majors does Rose offer?
+
+- intent: what_can_you_do
+  examples: |
+    - What can you do?
+    - Can you send emails?
+    - What do you have access to?
+    
 
 - intent: bot_challenge
   examples: |
@@ -95,3 +95,13 @@ nlu:
     - how is the weather today?
     - how cold is it?
     - how hot is it?
+    - Is it gong to rain today
+    - is it going to snow today
+
+- intent: events
+  examples: |
+    - What are some events on campus this weekend?
+    - What is going on this weekend?
+    - events today
+    - events tomorrow
+    - events next week
